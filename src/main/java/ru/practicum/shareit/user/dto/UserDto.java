@@ -4,8 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.validate.Create;
+import ru.practicum.shareit.validate.Update;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Data
@@ -16,9 +19,12 @@ public class UserDto {
 
     Integer id;
 
-    @Pattern(regexp = "\\S+", message = "Логин или имя не может содержать пробелы")
+    @NotBlank(groups = {Create.class}, message = "Имя не может быть пустым")
+    @Pattern(groups = {Update.class}, regexp = "\\S+", message = "Логин или имя не может содержать пробелы")
     String name;
 
-    @Email(message = "Неправильный формат электронной почты")
+    @NotBlank(groups = {Create.class}, message = "Email не может быть пустым")
+    @Email(groups = {Create.class, Update.class}, message = "Неправильный формат электронной почты")
+    @Pattern(groups = {Update.class}, regexp = "\\S+", message = "Email или имя не может содержать пробелы")
     String email;
 }

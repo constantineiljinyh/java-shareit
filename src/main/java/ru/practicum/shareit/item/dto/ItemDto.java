@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.validate.Create;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,13 +18,13 @@ public class ItemDto {
 
     Integer id;
 
-    @NotBlank(message = "Имя не может быть пустым")
+    @NotBlank(groups = {Create.class}, message = "Имя не может быть пустым")
     String name;
 
-    @NotBlank(message = "Описание не может быть пустым")
+    @NotBlank(groups = {Create.class}, message = "Описание не может быть пустым")
     String description;
 
-    @NotNull(message = "Статус не может быть пустым")
+    @NotNull(groups = {Create.class}, message = "Статус не может быть пустым")
     Boolean available;
 
     Integer owner;

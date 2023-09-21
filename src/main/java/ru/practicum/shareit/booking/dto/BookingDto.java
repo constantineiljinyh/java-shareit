@@ -9,6 +9,7 @@ import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 
 @Data
@@ -24,7 +25,7 @@ public class BookingDto {
     LocalDateTime start;
 
     @NotNull
-    @FutureOrPresent(message = "Время конца брони не может быть в прошлом")
+    @PastOrPresent(message = "Время конца брони не может быть в прошлом или настоящем")
     LocalDateTime end;
 
     @NotNull(message = "Вещь не может быть null")

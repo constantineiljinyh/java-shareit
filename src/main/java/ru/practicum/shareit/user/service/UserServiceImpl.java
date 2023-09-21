@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserMapper;
@@ -19,16 +18,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public UserDto addUser(User user) {
-        validateUser(user);
         checkUserByEmail(user);
         log.info(String.format("Пришел запрос на создание пользователя name %s", user.getName()));
-        User user1 = userRepository.addUser(user);
-
-        return UserMapper.toUserDto(user1);
+        return UserMapper.toUserDto(userRepository.addUser(user));
     }
 
     @Override
@@ -54,24 +50,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(User user) {
+    public UserDto updateUser(Integer userId, User user) {
+        user.setId(userId);
         checkUserByIdAndEmail(user);
         log.info(String.format("Пришел запрос на получение пользователя id %s", user.getId()));
-        User user1 = userRepository.updateUser(user);
-        return UserMapper.toUserDto(user1);
-    }
-
-    private void validateUser(User user) {
-        if (user == null) {
-            log.debug("Пользователь равен null.");
-            throw new ValidationException("Пустой пользователь");
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            throw new ValidationException("Пользователь без имени");
-        }
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new ValidationException("Пользователь без email");
-        }
+        return UserMapper.toUserDto(userRepository.updateUser(user));
     }
 
     public void checkUserByEmail(User user) {

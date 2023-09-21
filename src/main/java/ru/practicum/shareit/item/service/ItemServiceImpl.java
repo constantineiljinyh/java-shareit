@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -20,27 +20,29 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemServiceImpl implements ItemService {
 
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
-    private UserService userService;
+    private final UserService userService;
 
     @Override
-    public ItemDto addItem(Item item) {
+    public ItemDto addItem(Integer userId, Item item) {
+        item.setOwner(userId);
         if (item.getOwner() == null) {
             log.debug("Пришел запрос на создание вещи без владельца.");
             throw new ValidationException("Вещь не может быть без владельца");
         }
+
         userService.getUserById(item.getOwner());
         log.info(String.format("Пришел запрос на создание вещи name %s", item.getName()));
-        Item item1 = itemRepository.addItem(item);
-        return ItemMapper.toItemDto(item1);
+        return ItemMapper.toItemDto(itemRepository.addItem(item));
     }
 
     @Override
-    public ItemDto updateItem(Item item) {
+    public ItemDto updateItem(Integer itemId, Integer userId, Item item) {
+        item.setId(itemId);
+        item.setOwner(userId);
         log.info(String.format("Пришел запрос на обновление вещи id %s", item.getId()));
-        Item item1 = itemRepository.updateItem(item);
-        return ItemMapper.toItemDto(item1);
+        return ItemMapper.toItemDto(itemRepository.updateItem(item));
     }
 
     @Override

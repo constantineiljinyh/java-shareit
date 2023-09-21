@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
@@ -9,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class ItemRepository {
     private final HashMap<Integer, Item> itemHashMap = new HashMap<>();
@@ -25,14 +27,15 @@ public class ItemRepository {
         Item updateItem = itemHashMap.get(item.getId());
 
         if (updateItem == null) {
+            log.error("Попытка обновить вещь с несуществующим id");
             throw new NotFoundException("Элемент с указанным ID не найден");
         }
 
         if (updateItem.getOwner().equals(item.getOwner())) {
-            if (item.getName() != null) {
+            if (item.getName() != null && !item.getName().trim().isEmpty()) {
                 updateItem.setName(item.getName());
             }
-            if (item.getDescription() != null) {
+            if (item.getDescription() != null && !item.getDescription().trim().isEmpty()) {
                 updateItem.setDescription(item.getDescription());
             }
             if (item.getAvailable() != null) {
@@ -40,6 +43,7 @@ public class ItemRepository {
             }
             itemHashMap.put(updateItem.getId(), updateItem);
         } else {
+            log.error(String.format("Попытка обновить вещь не хозяином id %s", item.getOwner()));
             throw new NotFoundException("Вы не являетесь владельцем элемента");
         }
 
@@ -49,6 +53,7 @@ public class ItemRepository {
     public Item getItem(Integer itemId) {
         Item item = itemHashMap.get(itemId);
         if (item == null) {
+            log.error("Попытка получить вещь с несуществующим id");
             throw new NotFoundException("Вещи с id " + itemId + " не найдено.");
         }
         return item;
@@ -68,7 +73,7 @@ public class ItemRepository {
     public List<Item> searchItems(String text) {
         List<Item> matchingItems = new ArrayList<>();
 
-        if (text == null || text.isEmpty()) {
+        if (text == null || text.trim().isEmpty()) {
             return matchingItems;
         }
 

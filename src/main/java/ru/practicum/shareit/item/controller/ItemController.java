@@ -14,13 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.validate.Create;
+import ru.practicum.shareit.validate.Update;
 
-import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 @AllArgsConstructor
@@ -28,25 +26,18 @@ import java.util.List;
 public class ItemController {
     private final ItemService itemService;
 
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+
     @PostMapping
-    public ItemDto addItem(
-            @RequestHeader("X-Sharer-User-Id") Integer userId,
-            @Valid @RequestBody ItemDto itemDto
-    ) {
-        itemDto.setOwner(userId);
-        return itemService.addItem(ItemMapper.toItem(itemDto));
+    public ItemDto addItem(@RequestHeader(USER_ID_HEADER) Integer userId,
+                           @Validated(Create.class) @RequestBody ItemDto itemDto) {
+        return itemService.addItem(userId, ItemMapper.toItem(itemDto));
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(
-            @PathVariable Integer itemId,
-            @RequestHeader("X-Sharer-User-Id") Integer userId,
-            @RequestBody ItemDto itemDto
-    ) {
-        itemDto.setId(itemId);
-        itemDto.setOwner(userId);
-        return itemService.updateItem(ItemMapper.toItem(itemDto));
-
+    public ItemDto updateItem(@PathVariable Integer itemId, @RequestHeader(USER_ID_HEADER) Integer userId,
+                              @Validated(Update.class) @RequestBody ItemDto itemDto) {
+        return itemService.updateItem(itemId, userId, ItemMapper.toItem(itemDto));
     }
 
     @GetMapping("/{itemId}")
@@ -55,7 +46,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") Integer ownerId) {
+    public List<ItemDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Integer ownerId) {
         return itemService.getItemsByOwnerId(ownerId);
     }
 

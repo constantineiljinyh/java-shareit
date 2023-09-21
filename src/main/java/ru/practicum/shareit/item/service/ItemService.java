@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface ItemService {
 
-    ItemDto addItem(Item item);
+    ItemDto addItem(Integer userId, Item item);
 
-    ItemDto updateItem(Item item);
+    ItemDto updateItem(Integer itemId, Integer userId, Item item);
 
     ItemDto getItem(Integer itemId);
 

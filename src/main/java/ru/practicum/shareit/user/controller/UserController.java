@@ -13,23 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.validate.Create;
+import ru.practicum.shareit.validate.Update;
 
-import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/users")
 @Validated
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
     @PostMapping()
-    public UserDto addUser(@Valid @RequestBody UserDto userDto) {
+    public UserDto addUser(@Validated(Create.class) @RequestBody UserDto userDto) {
         return userService.addUser(UserMapper.toUser(userDto));
     }
 
@@ -49,8 +47,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable("userId") Integer userId, @Valid @RequestBody UserDto userDto) {
-        userDto.setId(userId);
-        return userService.updateUser(UserMapper.toUser(userDto));
+    public UserDto updateUser(@PathVariable("userId") Integer userId, @Validated(Update.class) @RequestBody UserDto userDto) {
+        return userService.updateUser(userId, UserMapper.toUser(userDto));
     }
 }
