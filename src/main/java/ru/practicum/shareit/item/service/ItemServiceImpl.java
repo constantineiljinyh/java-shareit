@@ -33,7 +33,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         userService.getUserById(item.getOwner());
-        log.info(String.format("Пришел запрос на создание вещи name %s", item.getName()));
+        log.info("Пришел запрос на создание вещи name {}", item.getName());
         return ItemMapper.toItemDto(itemRepository.addItem(item));
     }
 
@@ -41,20 +41,20 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto updateItem(Integer itemId, Integer userId, Item item) {
         item.setId(itemId);
         item.setOwner(userId);
-        log.info(String.format("Пришел запрос на обновление вещи id %s", item.getId()));
+        log.info("Пришел запрос на обновление вещи id {}", item.getId());
         return ItemMapper.toItemDto(itemRepository.updateItem(item));
     }
 
     @Override
     public ItemDto getItem(Integer itemId) {
         Item item = itemRepository.getItem(itemId);
-        log.info(String.format("Пришел запрос на получение вещи name %s", item.getName()));
+        log.info("Пришел запрос на получение вещи name {}", item.getName());
         return ItemMapper.toItemDto(item);
     }
 
     @Override
     public List<ItemDto> getItemsByOwnerId(Integer id) {
-        log.info(String.format("Пришел запрос на просмотр вещей владельцем id %s", id));
+        log.info("Пришел запрос на просмотр вещей владельцем id {}", id);
         Collection<Item> userList = itemRepository.getItemsByOwnerId(id);
 
         return userList.stream()
@@ -64,7 +64,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItems(String text) {
-        log.info(String.format("Пришел запрос на поиск вещей по тексту %s", text));
+        log.info("Пришел запрос на поиск вещей по тексту {}", text);
         List<Item> matchingItems = itemRepository.searchItems(text);
         List<ItemDto> matchingItemDto = new ArrayList<>();
 

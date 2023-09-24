@@ -32,10 +32,10 @@ public class ItemRepository {
         }
 
         if (updateItem.getOwner().equals(item.getOwner())) {
-            if (item.getName() != null && !item.getName().trim().isEmpty()) {
+            if (item.getName() != null && !item.getName().isBlank()) {
                 updateItem.setName(item.getName());
             }
-            if (item.getDescription() != null && !item.getDescription().trim().isEmpty()) {
+            if (item.getDescription() != null && !item.getDescription().isBlank()) {
                 updateItem.setDescription(item.getDescription());
             }
             if (item.getAvailable() != null) {
@@ -43,7 +43,7 @@ public class ItemRepository {
             }
             itemHashMap.put(updateItem.getId(), updateItem);
         } else {
-            log.error(String.format("Попытка обновить вещь не хозяином id %s", item.getOwner()));
+            log.error("Попытка обновить вещь не хозяином id {}", item.getOwner());
             throw new NotFoundException("Вы не являетесь владельцем элемента");
         }
 
@@ -73,7 +73,7 @@ public class ItemRepository {
     public List<Item> searchItems(String text) {
         List<Item> matchingItems = new ArrayList<>();
 
-        if (text == null || text.trim().isEmpty()) {
+        if (text == null || text.isBlank()) {
             return matchingItems;
         }
 

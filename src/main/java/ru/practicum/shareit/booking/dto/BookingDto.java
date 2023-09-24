@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
@@ -18,21 +18,21 @@ import java.time.LocalDateTime;
 @Builder
 public class BookingDto {
 
-    Integer id;
+    private Integer id;
 
     @NotNull
-    @FutureOrPresent(message = "Время начала брони не может быть в прошлом")
-    LocalDateTime start;
+    @Future(message = "Время начала брони не может быть в прошлом")
+    private LocalDateTime start;
 
     @NotNull
     @PastOrPresent(message = "Время конца брони не может быть в прошлом или настоящем")
-    LocalDateTime end;
+    private LocalDateTime end;
 
     @NotNull(message = "Вещь не может быть null")
-    Item item;
+    private Item item;
 
     @NotNull(message = "Пользователь не может быть null")
-    User booker;
+    private User booker;
 
-    Status status;
+    private Status status;
 }

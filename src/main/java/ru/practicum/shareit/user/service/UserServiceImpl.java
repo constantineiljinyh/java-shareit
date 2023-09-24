@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto addUser(User user) {
         checkUserByEmail(user);
-        log.info(String.format("Пришел запрос на создание пользователя name %s", user.getName()));
+        log.info("Пришел запрос на создание пользователя name {}", user.getName());
         return UserMapper.toUserDto(userRepository.addUser(user));
     }
 
@@ -39,13 +39,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Integer id) {
-        log.info(String.format("Пришел запрос на создание пользователя id %s", id));
+        log.info("Пришел запрос на создание пользователя id {}", id);
         return UserMapper.toUserDto(userRepository.getUserById(id));
     }
 
     @Override
     public UserDto removeUser(Integer id) {
-        log.info(String.format("Пришел запрос на удаление пользователя id %s", id));
+        log.info("Пришел запрос на удаление пользователя id {}", id);
         return UserMapper.toUserDto(userRepository.removeUser(id));
     }
 
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(Integer userId, User user) {
         user.setId(userId);
         checkUserByIdAndEmail(user);
-        log.info(String.format("Пришел запрос на получение пользователя id %s", user.getId()));
+        log.info("Пришел запрос на получение пользователя id {}", user.getId());
         return UserMapper.toUserDto(userRepository.updateUser(user));
     }
 
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
                 .filter(u -> u.getEmail().equals(user.getEmail()))
                 .collect(Collectors.toList());
         if (!collect.isEmpty()) {
-            log.error(String.format("Пользователь с email %s уже существует", user.getEmail()));
+            log.error("Пользователь с email {} уже существует", user.getEmail());
             throw new ConflictException("Пользователь с таким email уже существует");
         }
     }
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
         if (!collect.isEmpty()) {
-            log.error(String.format("Пользователь с id %s и email %s уже существует", user.getId(), user.getEmail()));
+            log.error("Пользователь с id {} и email {} уже существует", user.getId(), user.getEmail());
             throw new ConflictException("Пользователь с таким email и id уже существует");
         }
     }

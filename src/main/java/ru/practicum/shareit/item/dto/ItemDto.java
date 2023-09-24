@@ -16,18 +16,18 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class ItemDto {
 
-    Integer id;
+    private Integer id;
 
     @NotBlank(groups = {Create.class}, message = "Имя не может быть пустым")
-    String name;
+    private String name;
 
     @NotBlank(groups = {Create.class}, message = "Описание не может быть пустым")
-    String description;
+    private String description;
 
     @NotNull(groups = {Create.class}, message = "Статус не может быть пустым")
-    Boolean available;
+    private Boolean available;
 
-    Integer owner;
+    private Integer owner;
 
-    ItemRequest request;
+    private ItemRequest request;
 }

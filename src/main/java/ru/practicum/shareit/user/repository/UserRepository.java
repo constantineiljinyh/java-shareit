@@ -40,10 +40,10 @@ public class UserRepository {
 
     public User updateUser(User user) {
         User updateUser = userHashMap.get(user.getId());
-        if (user.getName() != null && !user.getName().trim().isEmpty()) {
+        if (user.getName() != null && !user.getName().isBlank()) {
             updateUser.setName(user.getName());
         }
-        if (user.getEmail() != null && !user.getEmail().trim().isEmpty()) {
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
             updateUser.setEmail(user.getEmail());
         }
         return userHashMap.put(updateUser.getId(), updateUser);

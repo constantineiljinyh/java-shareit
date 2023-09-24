@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 @Builder
 public class ItemRequestDto {
 
-    Integer id;
+    private Integer id;
 
     @NotBlank(message = "Описание не может быть пустым")
-    String description;
+    private String description;
 
     @NotNull(message = "Пользователь не может быть null")
-    User requestor;
+    private User requestor;
 
     @NotNull
-    LocalDateTime created;
+    private LocalDateTime created;
 }

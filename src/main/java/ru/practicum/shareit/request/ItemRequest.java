@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 @Builder
 public class ItemRequest {
 
-    Integer id;
+    private Integer id;
 
-    String description;
+    private String description;
 
-    User requestor;
+    private User requestor;
 
-    LocalDateTime created;
+    private LocalDateTime created;
 }

@@ -17,14 +17,14 @@ import javax.validation.constraints.Pattern;
 @Builder
 public class UserDto {
 
-    Integer id;
+    private Integer id;
 
     @NotBlank(groups = {Create.class}, message = "Имя не может быть пустым")
     @Pattern(groups = {Update.class}, regexp = "\\S+", message = "Логин или имя не может содержать пробелы")
-    String name;
+    private String name;
 
     @NotBlank(groups = {Create.class}, message = "Email не может быть пустым")
     @Email(groups = {Create.class, Update.class}, message = "Неправильный формат электронной почты")
     @Pattern(groups = {Update.class}, regexp = "\\S+", message = "Email или имя не может содержать пробелы")
-    String email;
+    private String email;
 }

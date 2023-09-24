@@ -16,15 +16,15 @@ import java.time.LocalDateTime;
 @Builder
 public class Booking {
 
-    Integer id;
+    private Integer id;
 
-    LocalDateTime start;
+    private LocalDateTime start;
 
-    LocalDateTime end;
+    private LocalDateTime end;
 
-    Item item;
+    private Item item;
 
-    User booker;
+    private User booker;
 
-    Status status;
+    private Status status;
 }
