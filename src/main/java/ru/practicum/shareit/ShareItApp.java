@@ -8,8 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 public class ShareItApp {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ShareItApp.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ShareItApp.class, args);
+    }
 
 }

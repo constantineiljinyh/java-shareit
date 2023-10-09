@@ -4,35 +4,26 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Validated
 public class BookingDto {
-
     private Integer id;
 
-    @NotNull
+    @NotNull(message = "Время начала бронирования должно быть заполнено")
     @Future(message = "Время начала брони не может быть в прошлом")
     private LocalDateTime start;
 
-    @NotNull
-    @PastOrPresent(message = "Время конца брони не может быть в прошлом или настоящем")
+    @NotNull(message = "Время окончания бронирования должно быть заполнено")
     private LocalDateTime end;
 
-    @NotNull(message = "Вещь не может быть null")
-    private Item item;
-
-    @NotNull(message = "Пользователь не может быть null")
-    private User booker;
-
-    private Status status;
+    private Integer itemId;
 }

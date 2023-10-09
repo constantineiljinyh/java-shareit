@@ -11,12 +11,15 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentFullDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validate.Create;
 import ru.practicum.shareit.validate.Update;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -42,13 +45,21 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable Integer itemId) {
-        return itemService.getItem(itemId);
+    public ItemDto getItem(@RequestHeader(USER_ID_HEADER) Integer userId, @PathVariable Integer itemId) {
+        return itemService.getItem(userId, itemId);
     }
 
     @GetMapping
     public List<ItemDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Integer ownerId) {
         return itemService.getItemsByOwnerId(ownerId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentFullDto addComment(@RequestHeader("X-Sharer-User-Id") Integer userId,
+                                     @PathVariable Integer itemId,
+                                     @Valid @RequestBody CommentDto commentDto) {
+
+        return itemService.addComment(userId, itemId, commentDto);
     }
 
     @GetMapping("/search")

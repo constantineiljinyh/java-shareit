@@ -4,29 +4,49 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.validate.Create;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.NotBlank;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.util.List;
 
+@Entity
+@Table(name = "items")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Item {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank(groups = {Create.class}, message = "Имя не может быть пустым")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User owner;
+
+    @Column(nullable = false)
     private String name;
 
-    @NotBlank(groups = {Create.class}, message = "Описание не может быть пустым")
+    @Column(nullable = false, length = 1000)
     private String description;
 
-    @NotBlank(groups = {Create.class}, message = "Статус не может быть пустым")
+    @Transient
+    private Booking lastBooking;
+
+    @Transient
+    private Booking nextBooking;
+
+    @Column(nullable = false)
     private Boolean available;
 
-    private Integer owner;
-
-    private ItemRequest request;
+    @Transient
+    private List<Comment> comments;
 }

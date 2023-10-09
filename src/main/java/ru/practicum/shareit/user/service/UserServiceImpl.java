@@ -3,7 +3,9 @@ package ru.practicum.shareit.user.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.ConflictException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserMapper;
@@ -11,6 +13,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,17 +23,17 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public UserDto addUser(User user) {
-        checkUserByEmail(user);
         log.info("Пришел запрос на создание пользователя name {}", user.getName());
-        return UserMapper.toUserDto(userRepository.addUser(user));
+        return UserMapper.toUserDto(userRepository.save(user));
     }
 
     @Override
     public List<UserDto> getAllUsers() {
         log.info("Пришел запрос на получение всех пользователей.");
-        Collection<User> userList = userRepository.getAllUsers();
+        Collection<User> userList = userRepository.findAll();
 
         return userList.stream()
                 .map(UserMapper::toUserDto)
@@ -39,37 +42,46 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Integer id) {
-        log.info("Пришел запрос на создание пользователя id {}", id);
-        return UserMapper.toUserDto(userRepository.getUserById(id));
+        log.info("Пришел запрос на получение пользователя id {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
+        return UserMapper.toUserDto(user);
     }
 
+    @Transactional
     @Override
     public UserDto removeUser(Integer id) {
         log.info("Пришел запрос на удаление пользователя id {}", id);
-        return UserMapper.toUserDto(userRepository.removeUser(id));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
+
+        userRepository.delete(user);
+        return UserMapper.toUserDto(user);
     }
 
+    @Transactional
     @Override
     public UserDto updateUser(Integer userId, User user) {
-        user.setId(userId);
-        checkUserByIdAndEmail(user);
-        log.info("Пришел запрос на получение пользователя id {}", user.getId());
-        return UserMapper.toUserDto(userRepository.updateUser(user));
-    }
+        Optional<User> optionalUser = userRepository.findById(userId);
 
-    public void checkUserByEmail(User user) {
-        List<UserDto> collect = userRepository.getAllUsers().stream()
-                .map(UserMapper::toUserDto)
-                .filter(u -> u.getEmail().equals(user.getEmail()))
-                .collect(Collectors.toList());
-        if (!collect.isEmpty()) {
-            log.error("Пользователь с email {} уже существует", user.getEmail());
-            throw new ConflictException("Пользователь с таким email уже существует");
+        if (optionalUser.isEmpty()) {
+            log.error("Пользователь с ID {} не найден", userId);
+            throw new NotFoundException("Пользователь с ID " + userId + " не найден");
         }
+        User existingUser = optionalUser.get();
+        checkUserByIdAndEmail(existingUser);
+        if (user.getName() != null && !user.getName().isBlank()) {
+            existingUser.setName(user.getName());
+        }
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            existingUser.setEmail(user.getEmail());
+        }
+        log.info("Пользователь с ID {} успешно обновлен", userId);
+        return UserMapper.toUserDto(userRepository.save(existingUser));
     }
 
     public void checkUserByIdAndEmail(User user) {
-        Collection<User> users = userRepository.getAllUsers();
+        Collection<User> users = userRepository.findAll();
         List<User> collect = users.stream()
                 .filter(u -> !u.getId().equals(user.getId()))
                 .filter(u -> u.getEmail().equals(user.getEmail()))
