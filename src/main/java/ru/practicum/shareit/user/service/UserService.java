@@ -11,9 +11,9 @@ public interface UserService {
 
     List<UserDto> getAllUsers();
 
-    UserDto getUserById(Integer id);
+    UserDto getUserById(int id);
 
-    UserDto removeUser(Integer id);
+    UserDto removeUser(int id);
 
-    UserDto updateUser(Integer userId, User user);
+    UserDto updateUser(int userId, User user);
 }

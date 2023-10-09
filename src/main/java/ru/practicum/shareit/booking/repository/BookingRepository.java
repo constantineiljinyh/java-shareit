@@ -12,33 +12,33 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
-    boolean existsBookingByIdAndStatusNot(Integer bookingId, Status status);
+    boolean existsBookingByIdAndStatusNot(int bookingId, Status status);
 
-    boolean existsBookingByBookerIdAndItemIdAndStatusAndStartBefore(Integer userId, Integer itemId, Status status, LocalDateTime currentTime);
+    boolean existsBookingByBookerIdAndItemIdAndStatusAndStartBefore(int userId, int itemId, Status status, LocalDateTime currentTime);
 
-    List<Booking> findAllByBookerIdOrderByStartDesc(Integer userId);
+    List<Booking> findAllByBookerIdOrderByStartDesc(int userId);
 
-    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(Integer userId, Status status);
+    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(int userId, Status status);
 
-    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(Integer userId, LocalDateTime start, LocalDateTime end);
+    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(int userId, LocalDateTime start, LocalDateTime end);
 
-    List<Booking> findAllByBookerIdAndEndBeforeOrderByStartDesc(Integer userId, LocalDateTime end);
+    List<Booking> findAllByBookerIdAndEndBeforeOrderByStartDesc(int userId, LocalDateTime end);
 
-    List<Booking> findAllByBookerIdAndStartAfterOrderByStartDesc(Integer userId, LocalDateTime start);
+    List<Booking> findAllByBookerIdAndStartAfterOrderByStartDesc(int userId, LocalDateTime start);
 
-    List<Booking> findAllByItem_OwnerIdOrderByStartDesc(Integer userId);
+    List<Booking> findAllByItem_OwnerIdOrderByStartDesc(int userId);
 
-    List<Booking> findAllByItem_OwnerIdAndStatusOrderByStartDesc(Integer userId, Status status);
+    List<Booking> findAllByItem_OwnerIdAndStatusOrderByStartDesc(int userId, Status status);
 
-    List<Booking> findAllByItem_OwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(Integer userId, LocalDateTime start, LocalDateTime end);
+    List<Booking> findAllByItem_OwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(int userId, LocalDateTime start, LocalDateTime end);
 
-    List<Booking> findAllByItem_OwnerIdAndEndBeforeOrderByStartDesc(Integer userId, LocalDateTime end);
+    List<Booking> findAllByItem_OwnerIdAndEndBeforeOrderByStartDesc(int userId, LocalDateTime end);
 
-    List<Booking> findAllByItem_OwnerIdAndStartAfterOrderByStartDesc(Integer userId, LocalDateTime start);
+    List<Booking> findAllByItem_OwnerIdAndStartAfterOrderByStartDesc(int userId, LocalDateTime start);
 
     @Query(value = "select b from Booking b where b.item.id = ?1 and b.item.owner.id = ?2 and b.status <> ?3 and b.start < ?4 order by b.start desc")
-    List<Booking> findLastBookingByOwnerId(Integer itemId, Integer bookerId, Status status, LocalDateTime currentTime);
+    List<Booking> findLastBookingByOwnerId(int itemId, int bookerId, Status status, LocalDateTime currentTime);
 
     @Query(value = "select b from Booking b where b.item.id = ?1 and b.item.owner.id = ?2 and b.status <> ?3 and b.start > ?4 order by b.start")
-    List<Booking> findNextBookingByOwnerId(Integer itemId, Integer bookerId, Status status, LocalDateTime currentTime);
+    List<Booking> findNextBookingByOwnerId(int itemId, int bookerId, Status status, LocalDateTime currentTime);
 }

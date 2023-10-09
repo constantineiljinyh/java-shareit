@@ -9,16 +9,16 @@ import java.util.List;
 
 public interface ItemService {
 
-    ItemDto addItem(Integer userId, Item item);
+    ItemDto addItem(int userId, Item item);
 
-    ItemDto updateItem(Integer itemId, Integer userId, Item item);
+    ItemDto updateItem(int itemId, int userId, Item item);
 
-    ItemDto getItem(Integer userId, Integer itemId);
+    ItemDto getItem(int userId, int itemId);
 
-    List<ItemDto> getItemsByOwnerId(Integer id);
+    List<ItemDto> getItemsByOwnerId(int id);
 
     List<ItemDto> searchItems(String text);
 
-    CommentFullDto addComment(Integer userId, Integer itemId, CommentDto commentDto);
+    CommentFullDto addComment(int userId, int itemId, CommentDto commentDto);
 }
 

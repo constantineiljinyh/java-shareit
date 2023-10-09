@@ -26,36 +26,36 @@ public class BookingController {
 
     @PostMapping
     public BookingFullDto addBooking(
-            @RequestHeader("X-Sharer-User-Id") Integer userId,
+            @RequestHeader("X-Sharer-User-Id") int userId,
             @Valid @RequestBody BookingDto bookingDto) {
         return bookingService.createBooking(userId, BookingMapper.toBooking(bookingDto));
     }
 
     @PatchMapping("/{bookingId}")
     public BookingFullDto approvedOrRejectedBooking(
-            @RequestHeader("X-Sharer-User-Id") Integer userId,
-            @PathVariable Integer bookingId,
+            @RequestHeader("X-Sharer-User-Id") int userId,
+            @PathVariable int bookingId,
             @RequestParam boolean approved) {
         return bookingService.updateBookingStatus(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
     public BookingFullDto getBookingById(
-            @RequestHeader("X-Sharer-User-Id") Integer userId,
-            @PathVariable Integer bookingId) {
+            @RequestHeader("X-Sharer-User-Id") int userId,
+            @PathVariable int bookingId) {
         return bookingService.getBookingById(userId, bookingId);
     }
 
     @GetMapping
     public List<BookingFullDto> getUserBookings(
-            @RequestHeader("X-Sharer-User-Id") Integer userId,
+            @RequestHeader("X-Sharer-User-Id") int userId,
             @RequestParam(required = false, defaultValue = "ALL") String state) {
         return bookingService.getBookingsByBookerId(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingFullDto> getOwnerBookings(
-            @RequestHeader("X-Sharer-User-Id") Integer userId,
+            @RequestHeader("X-Sharer-User-Id") int userId,
             @RequestParam(required = false, defaultValue = "ALL") String state) {
         return bookingService.getAllBookingsForItemsByOwnerId(userId, state);
     }

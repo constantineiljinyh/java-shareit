@@ -37,7 +37,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional
     @Override
-    public BookingFullDto createBooking(Integer userId, Booking booking) {
+    public BookingFullDto createBooking(int userId, Booking booking) {
         log.info("Пришел запрос на создание пользователем {} брони", userId);
         User user = UserMapper.toUser(userService.getUserById(userId));
         checkDateEndIsAfterStart(booking);
@@ -64,7 +64,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional
     @Override
-    public BookingFullDto updateBookingStatus(Integer userId, Integer bookingId, boolean approved) {
+    public BookingFullDto updateBookingStatus(int userId, int bookingId, boolean approved) {
         log.info("Пришел запрос на обновление пользователем {} брони {}", userId, bookingId);
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new NotFoundException("Бронирования с таким id не существует: " + bookingId));
@@ -88,7 +88,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingFullDto getBookingById(Integer userId, Integer bookingId) {
+    public BookingFullDto getBookingById(int userId, int bookingId) {
         log.info("Пришел запрос на получение пользователем {} брони {}", userId, bookingId);
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new NotFoundException("Бронирования с таким id не существует: " + bookingId));
@@ -103,7 +103,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingFullDto> getBookingsByBookerId(Integer bookerId, String state) {
+    public List<BookingFullDto> getBookingsByBookerId(int bookerId, String state) {
         log.info("Пришел запрос получение списка всех бронирований текущего пользователя {} брони", bookerId);
         userService.getUserById(bookerId);
         State stateBooking = State.valueOf(state);
@@ -137,7 +137,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingFullDto> getAllBookingsForItemsByOwnerId(Integer ownerId, String state) {
+    public List<BookingFullDto> getAllBookingsForItemsByOwnerId(int ownerId, String state) {
         log.info("Пришел запрос Получение списка бронирований для всех вещей текущего пользователя {} ", ownerId);
         userService.getUserById(ownerId);
         State stateBooking = State.valueOf(state);

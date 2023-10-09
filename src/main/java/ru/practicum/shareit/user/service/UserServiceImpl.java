@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserById(Integer id) {
+    public UserDto getUserById(int id) {
         log.info("Пришел запрос на получение пользователя id {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserDto removeUser(Integer id) {
+    public UserDto removeUser(int id) {
         log.info("Пришел запрос на удаление пользователя id {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserDto updateUser(Integer userId, User user) {
+    public UserDto updateUser(int userId, User user) {
         Optional<User> optionalUser = userRepository.findById(userId);
 
         if (optionalUser.isEmpty()) {

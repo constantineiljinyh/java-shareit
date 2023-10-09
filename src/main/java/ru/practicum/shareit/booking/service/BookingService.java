@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface BookingService {
 
-    BookingFullDto createBooking(Integer userId, Booking booking);
+    BookingFullDto createBooking(int userId, Booking booking);
 
-    BookingFullDto updateBookingStatus(Integer userId, Integer bookingId, boolean approved);
+    BookingFullDto updateBookingStatus(int userId, int bookingId, boolean approved);
 
-    BookingFullDto getBookingById(Integer userId, Integer bookingId);
+    BookingFullDto getBookingById(int userId, int bookingId);
 
-    List<BookingFullDto> getBookingsByBookerId(Integer bookerId, String state);
+    List<BookingFullDto> getBookingsByBookerId(int bookerId, String state);
 
-    List<BookingFullDto> getAllBookingsForItemsByOwnerId(Integer ownerId, String state);
+    List<BookingFullDto> getAllBookingsForItemsByOwnerId(int ownerId, String state);
 }

@@ -32,31 +32,31 @@ public class ItemController {
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto addItem(@RequestHeader(USER_ID_HEADER) Integer userId,
+    public ItemDto addItem(@RequestHeader(USER_ID_HEADER) int userId,
                            @Validated(Create.class) @RequestBody ItemDto itemDto) {
         return itemService.addItem(userId, ItemMapper.toItem(itemDto));
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@PathVariable Integer itemId,
-                              @RequestHeader(USER_ID_HEADER) Integer userId,
+    public ItemDto updateItem(@PathVariable int itemId,
+                              @RequestHeader(USER_ID_HEADER) int userId,
                               @Validated(Update.class) @RequestBody ItemDto itemDto) {
         return itemService.updateItem(itemId, userId, ItemMapper.toItem(itemDto));
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@RequestHeader(USER_ID_HEADER) Integer userId, @PathVariable Integer itemId) {
+    public ItemDto getItem(@RequestHeader(USER_ID_HEADER) int userId, @PathVariable int itemId) {
         return itemService.getItem(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Integer ownerId) {
+    public List<ItemDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) int ownerId) {
         return itemService.getItemsByOwnerId(ownerId);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentFullDto addComment(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                                     @PathVariable Integer itemId,
+    public CommentFullDto addComment(@RequestHeader("X-Sharer-User-Id") int userId,
+                                     @PathVariable int itemId,
                                      @Valid @RequestBody CommentDto commentDto) {
 
         return itemService.addComment(userId, itemId, commentDto);

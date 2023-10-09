@@ -44,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public ItemDto addItem(Integer userId, Item item) {
+    public ItemDto addItem(int userId, Item item) {
         User user = UserMapper.toUser(userService.getUserById(userId));
         item.setOwner(user);
         if (item.getOwner() == null) {
@@ -59,7 +59,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public ItemDto updateItem(Integer itemId, Integer userId, Item item) {
+    public ItemDto updateItem(int itemId, int userId, Item item) {
         item.setId(itemId);
         User user = UserMapper.toUser(userService.getUserById(userId));
         item.setOwner(user);
@@ -91,7 +91,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItem(Integer userId, Integer itemId) {
+    public ItemDto getItem(int userId, int itemId) {
         log.info("Пришел запрос на получение вещи {} пользователем {}", itemId, userId);
         LocalDateTime currentTime = LocalDateTime.now();
 
@@ -122,7 +122,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsByOwnerId(Integer userId) {
+    public List<ItemDto> getItemsByOwnerId(int userId) {
         log.info("Пришел запрос на получение владельцем {} всех вещей", userId);
         LocalDateTime currentTime = LocalDateTime.now();
         List<Item> items = itemRepository.findAllByOwnerIdOrderById(userId);
@@ -148,7 +148,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public CommentFullDto addComment(Integer userId, Integer itemId, CommentDto commentDto) {
+    public CommentFullDto addComment(int userId, int itemId, CommentDto commentDto) {
         log.info("Пришел запрос на создание комментария, пользователем {} к вещи {}", userId, itemId);
         LocalDateTime currentTime = LocalDateTime.now();
         checkBookingByItemAndUserAndStatusAndPast(userId, itemId);
