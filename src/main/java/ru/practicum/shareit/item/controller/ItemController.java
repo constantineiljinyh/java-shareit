@@ -57,7 +57,6 @@ public class ItemController {
         return itemService.getItemsByOwnerId(ownerId);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{itemId}/comment")
     public CommentFullDto addComment(@RequestHeader(USER_ID_HEADER) int userId,
                                      @PathVariable int itemId,
