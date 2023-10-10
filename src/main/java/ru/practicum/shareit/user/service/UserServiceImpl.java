@@ -70,10 +70,10 @@ public class UserServiceImpl implements UserService {
         }
         User existingUser = optionalUser.get();
         checkUserByIdAndEmail(existingUser);
-        if (user.getName() != null && !user.getName().isBlank()) {
+        if (user.getName() != null) {
             existingUser.setName(user.getName());
         }
-        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+        if (user.getEmail() != null) {
             existingUser.setEmail(user.getEmail());
         }
         log.info("Пользователь с ID {} успешно обновлен", userId);

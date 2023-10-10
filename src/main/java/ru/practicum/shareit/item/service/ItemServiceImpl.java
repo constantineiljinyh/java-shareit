@@ -76,10 +76,10 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Вы не являетесь владельцем вещи с ID " + itemId);
         }
 
-        if (item.getName() != null && !item.getName().isBlank()) {
+        if (item.getName() != null) {
             existingItem.setName(item.getName());
         }
-        if (item.getDescription() != null && !item.getDescription().isBlank()) {
+        if (item.getDescription() != null) {
             existingItem.setDescription(item.getDescription());
         }
         if (item.getAvailable() != null) {

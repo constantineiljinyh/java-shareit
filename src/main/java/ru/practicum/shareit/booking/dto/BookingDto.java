@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -19,7 +19,7 @@ public class BookingDto {
     private Integer id;
 
     @NotNull(message = "Время начала бронирования должно быть заполнено")
-    @Future(message = "Время начала брони не может быть в прошлом")
+    @FutureOrPresent(message = "Время начала брони не может быть в прошлом")
     private LocalDateTime start;
 
     @NotNull(message = "Время окончания бронирования должно быть заполнено")

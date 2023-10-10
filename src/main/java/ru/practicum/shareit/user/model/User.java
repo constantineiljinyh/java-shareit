@@ -12,7 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "users")
@@ -25,12 +25,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotNull
+    @NotBlank
     @Email
-    @Column(nullable = false, length = 512, unique = true)
+    @Column(length = 512, unique = true)
     private String email;
 
-    @NotNull
-    @Column(nullable = false)
+    @NotBlank
     private String name;
 }

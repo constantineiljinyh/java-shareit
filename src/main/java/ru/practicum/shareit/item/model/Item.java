@@ -16,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
@@ -30,21 +32,25 @@ public class Item {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotNull
     private User owner;
 
-    @Column(nullable = false)
+    @NotBlank
     private String name;
 
-    @Column(nullable = false, length = 1000)
+    @NotBlank
+    @Column(length = 1000)
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @Transient
     private Booking lastBooking;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @Transient
     private Booking nextBooking;
 
-    @Column(nullable = false)
+    @NotNull
     private Boolean available;
 
     @Transient
