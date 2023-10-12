@@ -4,55 +4,48 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "items")
+@Entity(name = "Comment")
+@Table(name = "comments")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Item {
+public class Comment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @Column(length = 255)
+    @NotBlank
+    private String text;
+
+    @ManyToOne
     @NotNull
-    private User owner;
+    @JoinColumn(name = "item_id")
+    private Item item;
 
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    @Column(length = 1000)
-    private String description;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Transient
-    private Booking lastBooking;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Transient
-    private Booking nextBooking;
+    @ManyToOne
+    @NotNull
+    @JoinColumn(name = "author_id")
+    private User authorName;
 
     @NotNull
-    private Boolean available;
+    @Column(name = "created", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime created;
 
-    @Transient
-    private List<Comment> comments;
 }

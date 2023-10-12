@@ -68,6 +68,16 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(UnsupportedStatusException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ShortErrorDto handleUnsupportedStatusException(UnsupportedStatusException ex) {
+        log.error("Ошибка: {}", ex.getMessage());
+        return ShortErrorDto.builder()
+                .error(ex.getMessage())
+                .build();
+    }
+
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
