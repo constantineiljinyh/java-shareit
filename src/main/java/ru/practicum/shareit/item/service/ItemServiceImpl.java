@@ -2,6 +2,9 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.Status;
@@ -19,6 +22,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
@@ -42,24 +47,31 @@ public class ItemServiceImpl implements ItemService {
 
     private final CommentRepository commentRepository;
 
+    private final ItemRequestRepository itemRequestRepository;
+
     @Transactional
     @Override
-    public ItemDto addItem(int userId, Item item) {
+    public ItemDto addItem(Integer userId, ItemDto itemDto) {
+        Item item = ItemMapper.toItem(itemDto);
+        if (itemDto.getRequestId() != null) {
+            Optional<ItemRequest> optionalItemRequest = itemRequestRepository.findById(itemDto.getRequestId());
+            if (optionalItemRequest.isPresent()) {
+                ItemRequest itemRequest = optionalItemRequest.get();
+                item.setRequest(itemRequest);
+            } else {
+                throw new NotFoundException("Запрос id " + itemDto.getRequestId() + " не найден");
+            }
+        }
         User user = UserMapper.toUser(userService.getUserById(userId));
         item.setOwner(user);
-        if (item.getOwner() == null) {
-            log.debug("Пришел запрос на создание вещи без владельца.");
-            throw new ValidationException("Вещь не может быть без владельца");
-        }
-
-        userService.getUserById(item.getOwner().getId());
         log.info("Пришел запрос на создание вещи name {}", item.getName());
-        return ItemMapper.toItemDto(itemRepository.save(item));
+        itemRepository.save(item);
+        return ItemMapper.toItemDto(item);
     }
 
     @Transactional
     @Override
-    public ItemDto updateItem(int itemId, int userId, Item item) {
+    public ItemDto updateItem(Integer itemId, Integer userId, Item item) {
         item.setId(itemId);
         User user = UserMapper.toUser(userService.getUserById(userId));
         item.setOwner(user);
@@ -70,11 +82,6 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Вещь с ID " + itemId + " не найдена");
         }
         Item existingItem = optionalItem.get();
-
-        if (!existingItem.getOwner().getId().equals(userId)) {
-            log.error("Пользователь с ID {} не является владельцем вещи с ID {}", userId, itemId);
-            throw new NotFoundException("Вы не являетесь владельцем вещи с ID " + itemId);
-        }
 
         if (item.getName() != null) {
             existingItem.setName(item.getName());
@@ -91,7 +98,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItem(int userId, int itemId) {
+    public ItemDto getItem(Integer userId, Integer itemId) {
         log.info("Пришел запрос на получение вещи {} пользователем {}", itemId, userId);
         LocalDateTime currentTime = LocalDateTime.now();
 
@@ -122,10 +129,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsByOwnerId(int userId) {
+    public List<ItemDto> getItemsByOwnerId(Integer userId, int from, int size) {
         log.info("Пришел запрос на получение владельцем {} всех вещей", userId);
         LocalDateTime currentTime = LocalDateTime.now();
-        List<Item> items = itemRepository.findAllByOwnerIdOrderById(userId);
+        Pageable pageable = PageRequest.of(from, size);
+        Page<Item> items = itemRepository.findAllByOwnerIdOrderById(userId, pageable);
 
         List<ItemDto> itemDtos = new ArrayList<>();
         for (Item item : items) {
@@ -148,7 +156,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public CommentFullDto addComment(int userId, int itemId, CommentDto commentDto) {
+    public CommentFullDto addComment(Integer userId, Integer itemId, CommentDto commentDto) {
         log.info("Пришел запрос на создание комментария, пользователем {} к вещи {}", userId, itemId);
         LocalDateTime currentTime = LocalDateTime.now();
         checkBookingByItemAndUserAndStatusAndPast(userId, itemId);
@@ -163,15 +171,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItems(String text) {
+    public List<ItemDto> searchItems(String text, int from, int size) {
         log.info("Пришел запрос на поиск вещей по тексту {}", text);
         if (text == null || text.isBlank()) {
+            log.error("Пришел запрос на поиск вещей без текста");
             return new ArrayList<>();
         }
-        return itemRepository.searchItems(text)
+        Pageable pageable = PageRequest.of(from, size);
+        return itemRepository.searchItems(text, pageable)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Item> findByRequestId(int requestId) {
+        return itemRepository.findByRequestId(requestId);
     }
 
     private void checkBookingByItemAndUserAndStatusAndPast(int userId, int itemId) {

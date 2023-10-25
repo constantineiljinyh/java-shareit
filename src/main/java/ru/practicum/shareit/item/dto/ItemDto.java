@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.validate.Create;
 
@@ -37,5 +36,5 @@ public class ItemDto {
 
     private List<CommentFullDto> comments;
 
-    private ItemRequest request;
+    private Integer requestId;
 }
