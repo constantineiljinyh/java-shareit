@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.repository;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -30,6 +31,35 @@ public class ItemRepositoryTest {
     @Autowired
     private ItemRequestRepository itemRequestRepository;
 
+    private User user;
+
+    private Item item1;
+
+    private Item item2;
+
+    @BeforeEach
+    void setUp() {
+        user = User.builder()
+                .name("username")
+                .email("email@example.com")
+                .build();
+        userRepository.save(user);
+        item1 = Item.builder()
+                .owner(user)
+                .name("Item 1")
+                .description("Description 1")
+                .available(true)
+                .build();
+        item2 = Item.builder()
+                .owner(user)
+                .name("Item 2")
+                .description("Description 2")
+                .available(true)
+                .build();
+        itemRepository.save(item1);
+        itemRepository.save(item2);
+    }
+
     @AfterEach
     public void cleanup() {
         itemRepository.deleteAll();
@@ -39,26 +69,6 @@ public class ItemRepositoryTest {
 
     @Test
     public void testFindAllByOwnerIdOrderById() {
-        User user = User.builder()
-                .name("username")
-                .email("email@example.com")
-                .build();
-        userRepository.save(user);
-        Item item1 = Item.builder()
-                .owner(user)
-                .name("Item 1")
-                .description("Description 1")
-                .available(true)
-                .build();
-        Item item2 = Item.builder()
-                .owner(user)
-                .name("Item 2")
-                .description("Description 2")
-                .available(true)
-                .build();
-        itemRepository.save(item1);
-        itemRepository.save(item2);
-
         Page<Item> result = itemRepository.findAllByOwnerIdOrderById(user.getId(), PageRequest.of(0, 10));
 
         assertEquals(2, result.getTotalElements());
@@ -68,29 +78,6 @@ public class ItemRepositoryTest {
 
     @Test
     public void testSearchItems() {
-        User user = User.builder()
-                .name("username")
-                .email("email@example.com")
-                .build();
-        userRepository.save(user);
-
-        Item item1 = Item.builder()
-                .owner(user)
-                .name("Item 1")
-                .description("Description 1")
-                .available(true)
-                .build();
-
-        Item item2 = Item.builder()
-                .owner(user)
-                .name("Item 2")
-                .description("Description 2")
-                .available(true)
-                .build();
-
-        itemRepository.save(item1);
-        itemRepository.save(item2);
-
         Page<Item> result = itemRepository.searchItems("Item", PageRequest.of(0, 10));
         assertEquals(2, result.getTotalElements());
         assertTrue(result.getContent().contains(item1));
@@ -99,21 +86,21 @@ public class ItemRepositoryTest {
 
     @Test
     public void testFindByRequestId() {
-        User user = User.builder()
+        User user1 = User.builder()
                 .name("username")
-                .email("email@example.com")
+                .email("emaill@example.com")
                 .build();
-        userRepository.save(user);
+        userRepository.save(user1);
 
         ItemRequest request = ItemRequest.builder()
                 .description("Request description")
-                .requestor(user)
+                .requestor(user1)
                 .created(LocalDateTime.now())
                 .build();
         itemRequestRepository.save(request);
 
         Item item1 = Item.builder()
-                .owner(user)
+                .owner(user1)
                 .request(request)
                 .name("Item 1")
                 .description("Description 1")
@@ -121,7 +108,7 @@ public class ItemRepositoryTest {
                 .build();
 
         Item item2 = Item.builder()
-                .owner(user)
+                .owner(user1)
                 .request(request)
                 .name("Item 2")
                 .description("Description 2")

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemMapper;
@@ -30,12 +31,13 @@ import java.util.List;
 @Slf4j
 public class ItemRequestServiceImpl implements ItemRequestService {
 
-    private ItemRequestRepository itemRequestRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
-    private UserService userService;
+    private final UserService userService;
 
-    private ItemService itemService;
+    private final ItemService itemService;
 
+    @Transactional
     @Override
     public ItemRequestFullDto createRequest(int userId, ItemRequestDto itemRequestDto) {
         UserDto userDto = userService.getUserById(userId);

@@ -14,7 +14,8 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestFullDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 import static ru.practicum.shareit.item.controller.ItemController.USER_ID_HEADER;
@@ -25,7 +26,7 @@ import static ru.practicum.shareit.item.controller.ItemController.USER_ID_HEADER
 @AllArgsConstructor
 @Validated
 public class ItemRequestController {
-    private ItemRequestService itemRequestService;
+    private final ItemRequestService itemRequestService;
 
     @PostMapping
     public ItemRequestFullDto createRequest(@RequestHeader(USER_ID_HEADER) int userId, @Validated @RequestBody ItemRequestDto itemRequestDto) {
@@ -40,8 +41,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestFullDto> getAllRequests(@RequestHeader(USER_ID_HEADER) int userId,
-                                                   @RequestParam(defaultValue = "0") @Min(0) int from,
-                                                   @RequestParam(defaultValue = "10") @Min(1) int size) {
+                                                   @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                   @Positive @RequestParam(defaultValue = "10") Integer size) {
         return itemRequestService.getAllRequests(userId, from, size);
     }
 
@@ -50,6 +51,4 @@ public class ItemRequestController {
         return itemRequestService.getRequestById(userId, requestId);
 
     }
-
-
 }

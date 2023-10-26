@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.shareit.item.controller.ItemController.USER_ID_HEADER;
 
 @WebMvcTest(controllers = ItemRequestController.class)
 class ItemRequestControllerTest {
@@ -53,7 +54,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.createRequest(userId, itemRequestDto)).thenReturn(itemRequestFullDto);
 
         mvc.perform(post("/requests")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(USER_ID_HEADER, userId)
                         .content(mapper.writeValueAsString(itemRequestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +79,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getUserRequests(Mockito.anyInt())).thenReturn(itemRequests);
 
         mvc.perform(get("/requests")
-                        .header("X-Sharer-User-Id", requestorId)
+                        .header(USER_ID_HEADER, requestorId)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.ALL_VALUE))
                 .andExpect(status().isOk())
@@ -102,7 +103,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getAllRequests(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(itemRequests);
 
         mvc.perform(get("/requests/all")
-                        .header("X-Sharer-User-Id", 1)
+                        .header(USER_ID_HEADER, 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.ALL_VALUE))
                 .andExpect(status().isOk())
@@ -121,7 +122,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.getRequestById(Mockito.anyInt(), Mockito.anyInt())).thenReturn(itemRequestFullDto);
 
         mvc.perform(get("/requests/{requestId}", requestId)
-                        .header("X-Sharer-User-Id", requestorId)
+                        .header(USER_ID_HEADER, requestorId)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.ALL_VALUE))
                 .andExpect(status().isOk())

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.repository;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -25,6 +26,40 @@ class ItemRequestRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    private User user;
+
+    private ItemRequest itemRequest;
+
+    private ItemRequest request1;
+
+    private ItemRequest request2;
+
+    @BeforeEach
+    void setUp() {
+        user = User.builder()
+                .name("testUser")
+                .email("testuser@example.com")
+                .build();
+        userRepository.save(user);
+
+        itemRequest = ItemRequest.builder()
+                .description("Test request")
+                .requestor(user)
+                .created(LocalDateTime.now())
+                .build();
+
+        request1 = ItemRequest.builder()
+                .description("Request 1")
+                .requestor(user)
+                .created(LocalDateTime.now())
+                .build();
+
+        request2 = ItemRequest.builder()
+                .description("Request 2")
+                .requestor(user)
+                .created(LocalDateTime.now())
+                .build();
+    }
 
     @AfterEach
     public void cleanup() {
@@ -34,17 +69,6 @@ class ItemRequestRepositoryTest {
 
     @Test
     public void findByRequestorIdOrderByCreatedDescTest() {
-        User user = User.builder()
-                .name("testUser")
-                .email("testuser@example.com")
-                .build();
-        userRepository.save(user);
-
-        ItemRequest itemRequest = ItemRequest.builder()
-                .description("Test request")
-                .requestor(user)
-                .created(LocalDateTime.now())
-                .build();
         itemRequestRepository.save(itemRequest);
 
         List<ItemRequest> result = itemRequestRepository.findByRequestorIdOrderByCreatedDesc(user.getId());
@@ -56,24 +80,6 @@ class ItemRequestRepositoryTest {
 
     @Test
     void findAllByOrderByCreatedDescTest() {
-        User user = User.builder()
-                .name("testUser")
-                .email("testuser@example.com")
-                .build();
-        userRepository.save(user);
-
-        ItemRequest request1 = ItemRequest.builder()
-                .description("Request 1")
-                .requestor(user)
-                .created(LocalDateTime.now())
-                .build();
-
-        ItemRequest request2 = ItemRequest.builder()
-                .description("Request 2")
-                .requestor(user)
-                .created(LocalDateTime.now())
-                .build();
-
         itemRequestRepository.save(request1);
         itemRequestRepository.save(request2);
 
@@ -86,20 +92,8 @@ class ItemRequestRepositoryTest {
 
     @Test
     void findByIdAndRequestorIdTest() {
-        User user = User.builder()
-                .name("testUser")
-                .email("test@example.com")
-                .build();
-        userRepository.save(user);
-
-        ItemRequest request = ItemRequest.builder()
-                .requestor(user)
-                .description("Request 1")
-                .created(LocalDateTime.now())
-                .build();
-
-        itemRequestRepository.save(request);
-        ItemRequest foundRequest = itemRequestRepository.findByIdAndRequestorId(request.getId(), user.getId());
-        assertEquals(foundRequest, request);
+        itemRequestRepository.save(itemRequest);
+        ItemRequest foundRequest = itemRequestRepository.findByIdAndRequestorId(itemRequest.getId(), user.getId());
+        assertEquals(foundRequest, itemRequest);
     }
 }

@@ -22,6 +22,8 @@ import ru.practicum.shareit.validate.Create;
 import ru.practicum.shareit.validate.Update;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -54,8 +56,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Integer ownerId,
-                                           @RequestParam(defaultValue = "0") int from,
-                                           @RequestParam(defaultValue = "10") int size) {
+                                           @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                           @Positive @RequestParam(defaultValue = "10") Integer size) {
         return itemService.getItemsByOwnerId(ownerId, from, size);
     }
 
@@ -69,8 +71,8 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestParam String text,
-                                     @RequestParam(defaultValue = "0") int from,
-                                     @RequestParam(defaultValue = "10") int size) {
+                                     @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                     @Positive @RequestParam(defaultValue = "10") Integer size) {
         return itemService.searchItems(text, from, size);
     }
 }

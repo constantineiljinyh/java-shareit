@@ -52,21 +52,23 @@ class ItemRequestServiceImplTest {
 
     private final EasyRandom random = new EasyRandom();
 
+    private UserDto userDto;
 
     @BeforeEach
     void setUp() {
         itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userService, itemService);
+        userDto = new UserDto();
+        userDto.setId(1);
+        userDto.setName("John");
+        userDto.setEmail("john@example.com");
+
+
     }
 
     @Test
     void testCreateRequest() {
         int userId = 1;
         String description = "Test item request description";
-
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setName("John");
-        userDto.setEmail("john@example.com");
 
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         itemRequestDto.setDescription(description);
@@ -93,11 +95,6 @@ class ItemRequestServiceImplTest {
     @Test
     void testGetUserRequests() {
         int userId = 1;
-
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setName("John");
-        userDto.setEmail("john@example.com");
 
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setId(1);
@@ -134,11 +131,6 @@ class ItemRequestServiceImplTest {
         int userId = 1;
         int from = 0;
         int size = 10;
-
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setName("John");
-        userDto.setEmail("john@example.com");
 
         UserDto userDto2 = new UserDto();
         userDto2.setId(2);
@@ -185,9 +177,6 @@ class ItemRequestServiceImplTest {
         int userId = 1;
         int requestId = 1;
 
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setId(1);
         itemRequest.setDescription("Test item request description");
@@ -222,11 +211,6 @@ class ItemRequestServiceImplTest {
         int userId = 1;
         int requestId = 1;
 
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setName("John");
-        userDto.setEmail("john@example.com");
-
         when(userService.getUserById(userId)).thenReturn(userDto);
 
         assertThrows(NotFoundException.class, () -> {
@@ -234,6 +218,4 @@ class ItemRequestServiceImplTest {
         });
         verify(userService, times(1)).getUserById(userId);
     }
-
-
 }

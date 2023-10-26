@@ -67,30 +67,45 @@ class ItemServiceImplTest {
 
     private final EasyRandom random = new EasyRandom();
 
+    private ItemDto itemDto;
+
+    private UserDto userDto;
+
+    private ItemRequest itemRequest;
+
+    private Item existingItem;
 
     @BeforeEach
     void setUp() {
         itemService = new ItemServiceImpl(itemRepository, userService, bookingRepository, commentRepository, itemRequestRepository);
-    }
 
-    @Test
-    void testAddItem() {
-        int userId = 1;
-        ItemDto itemDto = new ItemDto();
+        itemDto = new ItemDto();
         itemDto.setId(1);
         itemDto.setName("Дрель");
         itemDto.setDescription("Простая дрель");
         itemDto.setAvailable(true);
         itemDto.setRequestId(1);
 
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
+        userDto = new UserDto();
+        userDto.setId(1);
         userDto.setName("John");
         userDto.setEmail("john@example.com");
 
-        ItemRequest itemRequest = new ItemRequest();
+        itemRequest = new ItemRequest();
         itemRequest.setId(1);
         itemRequest.setDescription("Test item request description");
+
+        existingItem = new Item();
+        existingItem.setId(1);
+        existingItem.setName("Drill");
+        existingItem.setDescription("Drill Description");
+        existingItem.setAvailable(true);
+        existingItem.setOwner(UserMapper.toUser(userDto));
+    }
+
+    @Test
+    void testAddItem() {
+        int userId = 1;
 
         when(userService.getUserById(userId)).thenReturn(userDto);
         when(itemRequestRepository.findById(itemDto.getRequestId())).thenReturn(Optional.of(itemRequest));
@@ -110,18 +125,6 @@ class ItemServiceImplTest {
     @Test
     void testAddItemWithNonExistingRequest() {
         int userId = 1;
-        ItemDto itemDto = new ItemDto();
-        itemDto.setId(1);
-        itemDto.setName("Дрель");
-        itemDto.setDescription("Простая дрель");
-        itemDto.setAvailable(true);
-        itemDto.setRequestId(1);
-
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setName("John");
-        userDto.setEmail("john@example.com");
-
 
         when(itemRequestRepository.findById(itemDto.getRequestId())).thenReturn(Optional.empty());
 
@@ -136,55 +139,24 @@ class ItemServiceImplTest {
         int itemId = 1;
         int userId = 1;
 
-        ItemDto updatedItemDto = new ItemDto();
-        updatedItemDto.setId(itemId);
-        updatedItemDto.setName("Updated Drill");
-        updatedItemDto.setDescription("Updated Drill Description");
-        updatedItemDto.setAvailable(false);
-
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setName("John");
-        userDto.setEmail("john@example.com");
-
-        Item existingItem = new Item();
-        existingItem.setId(itemId);
-        existingItem.setName("Drill");
-        existingItem.setDescription("Drill Description");
-        existingItem.setAvailable(true);
-        existingItem.setOwner(UserMapper.toUser(userDto));
+        itemDto.setAvailable(false);
 
         when(userService.getUserById(userId)).thenReturn(userDto);
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(existingItem));
-        when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        ItemDto result = itemService.updateItem(itemId, userId, ItemMapper.toItem(itemDto));
 
-        ItemDto result = itemService.updateItem(itemId, userId, ItemMapper.toItem(updatedItemDto));
-
-        assertEquals(updatedItemDto.getName(), result.getName());
-        assertEquals(updatedItemDto.getDescription(), result.getDescription());
-        assertEquals(updatedItemDto.getAvailable(), result.getAvailable());
+        assertEquals(itemDto.getName(), result.getName());
+        assertEquals(itemDto.getDescription(), result.getDescription());
+        assertEquals(itemDto.getAvailable(), result.getAvailable());
 
         verify(userService, times(1)).getUserById(userId);
         verify(itemRepository, times(1)).findById(itemId);
-        verify(itemRepository, times(1)).save(any(Item.class));
     }
 
     @Test
     void testUpdateItemWithNonExistingItem() {
         int itemId = 1;
         int userId = 1;
-
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setName("John");
-        userDto.setEmail("john@example.com");
-
-        Item existingItem = new Item();
-        existingItem.setId(itemId);
-        existingItem.setName("Drill");
-        existingItem.setDescription("Drill Description");
-        existingItem.setAvailable(true);
-        existingItem.setOwner(UserMapper.toUser(userDto));
 
         when(userService.getUserById(userId)).thenReturn(userDto);
         when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
@@ -199,68 +171,35 @@ class ItemServiceImplTest {
         int itemId = 1;
         int userId = 1;
 
-        ItemDto updatedItemDto = new ItemDto();
-        updatedItemDto.setId(itemId);
-        updatedItemDto.setName("Updated Drill");
-
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setName("John");
-        userDto.setEmail("john@example.com");
-
-        Item existingItem = new Item();
-        existingItem.setId(itemId);
-        existingItem.setName("Drill");
-        existingItem.setOwner(UserMapper.toUser(userDto));
-
         when(userService.getUserById(userId)).thenReturn(userDto);
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(existingItem));
-        when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ItemDto result = itemService.updateItem(itemId, userId, ItemMapper.toItem(updatedItemDto));
+        ItemDto result = itemService.updateItem(itemId, userId, ItemMapper.toItem(itemDto));
 
-        assertEquals(updatedItemDto.getName(), result.getName());
+        assertEquals(itemDto.getName(), result.getName());
         assertEquals(existingItem.getDescription(), result.getDescription());
         assertEquals(existingItem.getAvailable(), result.getAvailable());
 
         verify(userService, times(1)).getUserById(userId);
         verify(itemRepository, times(1)).findById(itemId);
-        verify(itemRepository, times(1)).save(any(Item.class));
     }
 
     @Test
     void testUpdateItemWithDescriptionOnly() {
-
         int itemId = 1;
         int userId = 1;
 
-        ItemDto updatedItemDto = new ItemDto();
-        updatedItemDto.setId(itemId);
-        updatedItemDto.setDescription("Updated Description");
-
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setName("John");
-        userDto.setEmail("john@example.com");
-
-        Item existingItem = new Item();
-        existingItem.setId(itemId);
-        existingItem.setName("Drill");
-        existingItem.setOwner(UserMapper.toUser(userDto));
-
         when(userService.getUserById(userId)).thenReturn(userDto);
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(existingItem));
-        when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ItemDto result = itemService.updateItem(itemId, userId, ItemMapper.toItem(updatedItemDto));
+        ItemDto result = itemService.updateItem(itemId, userId, ItemMapper.toItem(itemDto));
 
         assertEquals(existingItem.getName(), result.getName());
-        assertEquals(updatedItemDto.getDescription(), result.getDescription());
+        assertEquals(itemDto.getDescription(), result.getDescription());
         assertEquals(existingItem.getAvailable(), result.getAvailable());
 
         verify(userService, times(1)).getUserById(userId);
         verify(itemRepository, times(1)).findById(itemId);
-        verify(itemRepository, times(1)).save(any(Item.class));
     }
 
     @Test
@@ -268,35 +207,17 @@ class ItemServiceImplTest {
         int itemId = 1;
         int userId = 1;
 
-        ItemDto updatedItemDto = new ItemDto();
-        updatedItemDto.setId(itemId);
-        updatedItemDto.setAvailable(false);
-
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setName("John");
-        userDto.setEmail("john@example.com");
-
-        Item existingItem = new Item();
-        existingItem.setId(itemId);
-        existingItem.setName("Drill");
-        existingItem.setOwner(UserMapper.toUser(userDto));
-
         when(userService.getUserById(userId)).thenReturn(userDto);
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(existingItem));
-        when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-
-        ItemDto result = itemService.updateItem(itemId, userId, ItemMapper.toItem(updatedItemDto));
-
+        ItemDto result = itemService.updateItem(itemId, userId, ItemMapper.toItem(itemDto));
 
         assertEquals(existingItem.getName(), result.getName());
         assertEquals(existingItem.getDescription(), result.getDescription());
-        assertEquals(updatedItemDto.getAvailable(), result.getAvailable());
+        assertEquals(itemDto.getAvailable(), result.getAvailable());
 
         verify(userService, times(1)).getUserById(userId);
         verify(itemRepository, times(1)).findById(itemId);
-        verify(itemRepository, times(1)).save(any(Item.class));
     }
 
     @Test
@@ -386,14 +307,14 @@ class ItemServiceImplTest {
     @Test
     void testSearchItems() {
         String text = "text";
-        ItemDto itemDto1 = random.nextObject(ItemDto.class);
-        itemDto1.setComments(null);
-        itemDto1.setRequestId(null);
-        itemDto1.setLastBooking(null);
-        itemDto1.setNextBooking(null);
-        itemDto1.setName("Название " + text);
-        itemDto1.setDescription("Описание " + text);
-        List<ItemDto> itemsDto = List.of(itemDto1);
+
+        itemDto.setComments(null);
+        itemDto.setRequestId(null);
+        itemDto.setLastBooking(null);
+        itemDto.setNextBooking(null);
+        itemDto.setName("Название " + text);
+        itemDto.setDescription("Описание " + text);
+        List<ItemDto> itemsDto = List.of(itemDto);
 
         List<Item> items = itemsDto.stream()
                 .map(ItemMapper::toItem)
@@ -407,7 +328,7 @@ class ItemServiceImplTest {
         List<ItemDto> searchResult = itemService.searchItems(text, 0, 5);
 
         assertEquals(1, searchResult.size());
-        assertEquals(itemDto1, searchResult.get(0));
+        assertEquals(itemDto, searchResult.get(0));
     }
 
     @Test
@@ -418,7 +339,6 @@ class ItemServiceImplTest {
 
     @Test
     void findByRequestIdTest() {
-        // Arrange
         int requestId = 1;
         List<Item> expectedItems = List.of(new Item(), new Item(), new Item());
 

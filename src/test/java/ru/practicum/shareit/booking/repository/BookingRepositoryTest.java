@@ -39,6 +39,12 @@ class BookingRepositoryTest {
 
     private Item item2;
 
+    private Booking booking1;
+
+    private Booking booking2;
+
+    private LocalDateTime now;
+
     @BeforeEach
     void setUp() {
         user = User.builder()
@@ -60,6 +66,16 @@ class BookingRepositoryTest {
                 .build();
         itemRepository.save(item1);
         itemRepository.save(item2);
+
+        booking1 = Booking.builder()
+                .item(item1)
+                .booker(user)
+                .build();
+        booking2 = Booking.builder()
+                .item(item2)
+                .booker(user)
+                .build();
+        now = LocalDateTime.now();
     }
 
     @AfterEach
@@ -72,31 +88,22 @@ class BookingRepositoryTest {
 
     @Test
     void testExistsBookingByIdAndStatusNot() {
-        LocalDateTime now = LocalDateTime.now();
-        Booking booking = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now)
-                .end(now.plusHours(1))
-                .build();
-        bookingRepository.save(booking);
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(now);
+        booking1.setEnd(now.plusHours(1));
 
-        boolean exists = bookingRepository.existsBookingByIdAndStatusNot(booking.getId(), Status.APPROVED);
+        bookingRepository.save(booking1);
+
+        boolean exists = bookingRepository.existsBookingByIdAndStatusNot(booking1.getId(), Status.APPROVED);
         assertTrue(exists);
     }
 
     @Test
     void testExistsBookingByBookerIdAndItemIdAndStatusAndStartBefore() {
-        LocalDateTime now = LocalDateTime.now();
-        Booking booking = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now)
-                .end(now.plusHours(1))
-                .build();
-        bookingRepository.save(booking);
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(now);
+        booking1.setEnd(now.plusHours(1));
+        bookingRepository.save(booking1);
 
         boolean exists = bookingRepository.existsBookingByBookerIdAndItemIdAndStatusAndStartBefore(
                 user.getId(), item1.getId(), Status.WAITING, LocalDateTime.now().plusMinutes(30));
@@ -106,23 +113,15 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllByBookerIdOrderByStartDesc() {
-        LocalDateTime now = LocalDateTime.now();
-        Booking booking1 = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now.minusDays(1))
-                .end(now)
-                .build();
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(now.minusDays(1));
+        booking1.setEnd(now);
         bookingRepository.save(booking1);
 
-        Booking booking2 = Booking.builder()
-                .item(item2)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now.plusDays(1))
-                .end(now.plusDays(2))
-                .build();
+        booking2.setStatus(Status.WAITING);
+        booking2.setStart(now.plusDays(1));
+        booking2.setEnd(now.plusDays(2));
+
         bookingRepository.save(booking2);
 
         Page<Booking> bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(user.getId(), PageRequest.of(0, 10));
@@ -135,23 +134,15 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllByBookerIdAndStatusOrderByStartDesc() {
-        LocalDateTime now = LocalDateTime.now();
-        Booking booking1 = Booking.builder()
-                .item(item2)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now.minusDays(1))
-                .end(now)
-                .build();
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(now.minusDays(1));
+        booking1.setEnd(now);
         bookingRepository.save(booking1);
 
-        Booking booking2 = Booking.builder()
-                .item(item2)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now.plusDays(1))
-                .end(now.plusDays(2))
-                .build();
+        booking2.setStatus(Status.WAITING);
+        booking2.setStart(now.plusDays(1));
+        booking2.setEnd(now.plusDays(2));
+
         bookingRepository.save(booking2);
 
         Page<Booking> bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(user.getId(), Status.WAITING, PageRequest.of(0, 10));
@@ -164,38 +155,28 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc() {
-        LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = now.minusDays(1);
         LocalDateTime end = now.plusDays(1);
 
-        Booking booking = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.APPROVED)
-                .start(start)
-                .end(end)
-                .build();
-        bookingRepository.save(booking);
+        booking1.setStatus(Status.APPROVED);
+        booking1.setStart(start);
+        booking1.setEnd(end);
+        bookingRepository.save(booking1);
 
         Page<Booking> bookings = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                 user.getId(), end, start, PageRequest.of(0, 10));
 
-        assertTrue(bookings.getContent().contains(booking));
+        assertTrue(bookings.getContent().contains(booking1));
     }
 
     @Test
     void testFindAllByBookerIdAndEndBeforeOrderByStartDesc() {
-        LocalDateTime now = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.now();
 
-        Booking booking = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now)
-                .end(end)
-                .build();
-        bookingRepository.save(booking);
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(now);
+        booking1.setEnd(end);
+        bookingRepository.save(booking1);
 
         Page<Booking> bookings = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(
                 user.getId(), LocalDateTime.now(), PageRequest.of(0, 10));
@@ -205,58 +186,45 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllByBookerIdAndStartAfterOrderByStartDesc() {
-        LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = now.plusDays(1);
 
-        Booking booking = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(start)
-                .end(now.plusDays(2))
-                .build();
-        bookingRepository.save(booking);
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(start);
+        booking1.setEnd(now.plusDays(2));
+
+        bookingRepository.save(booking1);
 
         Page<Booking> bookings = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(
                 user.getId(), now, PageRequest.of(0, 10));
 
-        assertTrue(bookings.getContent().contains(booking));
+        assertTrue(bookings.getContent().contains(booking1));
     }
 
     @Test
     void testFindAllByItem_OwnerIdOrderByStartDesc() {
-        LocalDateTime now = LocalDateTime.now();
-        Booking booking = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now.minusDays(1))
-                .end(now.plusDays(1))
-                .build();
-        bookingRepository.save(booking);
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(now.minusDays(1));
+        booking1.setEnd(now.plusDays(1));
+
+        bookingRepository.save(booking1);
 
         Page<Booking> bookings = bookingRepository.findAllByItem_OwnerIdOrderByStartDesc(
                 item1.getOwner().getId(), PageRequest.of(0, 10));
 
-        assertTrue(bookings.getContent().contains(booking));
+        assertTrue(bookings.getContent().contains(booking1));
     }
 
     @Test
     void testFindAllByItem_OwnerIdAndStatusOrderByStartDesc() {
-        LocalDateTime now = LocalDateTime.now();
-        Booking booking = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now.minusDays(1))
-                .end(now.plusDays(1))
-                .build();
-        bookingRepository.save(booking);
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(now.minusDays(1));
+        booking1.setEnd(now.plusDays(1));
+        bookingRepository.save(booking1);
 
         Page<Booking> bookings = bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(
                 item1.getOwner().getId(), Status.WAITING, PageRequest.of(0, 10));
 
-        assertTrue(bookings.getContent().contains(booking));
+        assertTrue(bookings.getContent().contains(booking1));
     }
 
     @Test
@@ -265,33 +233,25 @@ class BookingRepositoryTest {
         LocalDateTime start = currentDateTime.minusDays(1);
         LocalDateTime end = currentDateTime.plusDays(1);
 
-        Booking booking = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(start)
-                .end(end)
-                .build();
-        bookingRepository.save(booking);
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(start);
+        booking1.setEnd(end);
+
+        bookingRepository.save(booking1);
 
         Page<Booking> bookings = bookingRepository.findAllByItem_OwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                 item1.getOwner().getId(), currentDateTime, currentDateTime, PageRequest.of(0, 10));
 
-        assertTrue(bookings.getContent().contains(booking));
+        assertTrue(bookings.getContent().contains(booking1));
     }
 
     @Test
     void testFindAllByItem_OwnerIdAndEndBeforeOrderByStartDesc() {
-        LocalDateTime now = LocalDateTime.now();
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(now);
+        booking1.setEnd(now);
 
-        Booking booking = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now)
-                .end(now)
-                .build();
-        bookingRepository.save(booking);
+        bookingRepository.save(booking1);
 
         Page<Booking> bookings = bookingRepository.findAllByItem_OwnerIdAndEndBeforeOrderByStartDesc(
                 item1.getOwner().getId(), LocalDateTime.now(), PageRequest.of(0, 10));
@@ -301,22 +261,18 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllByItem_OwnerIdAndStartAfterOrderByStartDesc() {
-        LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = now.minusDays(2);
 
-        Booking booking = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.WAITING)
-                .start(now.plusDays(1))
-                .end(now.plusDays(2))
-                .build();
-        bookingRepository.save(booking);
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(now.plusDays(1));
+        booking1.setEnd(now.plusDays(2));
+
+        bookingRepository.save(booking1);
 
         Page<Booking> bookings = bookingRepository.findAllByItem_OwnerIdAndStartAfterOrderByStartDesc(
                 item1.getOwner().getId(), start, PageRequest.of(0, 10));
 
-        assertTrue(bookings.getContent().contains(booking));
+        assertTrue(bookings.getContent().contains(booking1));
     }
 
     @Test
@@ -324,13 +280,10 @@ class BookingRepositoryTest {
         LocalDateTime currentTime = LocalDateTime.now();
         List<Booking> bookings = new ArrayList<>();
 
-        Booking booking1 = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.REJECTED)
-                .start(currentTime.minusDays(1))
-                .end(currentTime.minusHours(23))
-                .build();
+        booking1.setStatus(Status.REJECTED);
+        booking1.setStart(currentTime.minusDays(1));
+        booking1.setEnd(currentTime.minusHours(23));
+
         bookings.add(booking1);
 
         bookingRepository.saveAll(bookings);
@@ -345,13 +298,10 @@ class BookingRepositoryTest {
         LocalDateTime currentTime = LocalDateTime.now();
         List<Booking> bookings = new ArrayList<>();
 
-        Booking booking1 = Booking.builder()
-                .item(item1)
-                .booker(user)
-                .status(Status.REJECTED)
-                .start(currentTime.plusDays(1))
-                .end(currentTime.plusDays(2))
-                .build();
+        booking1.setStatus(Status.REJECTED);
+        booking1.setStart(currentTime.plusDays(1));
+        booking1.setEnd(currentTime.plusDays(2));
+
         bookings.add(booking1);
 
         bookingRepository.saveAll(bookings);

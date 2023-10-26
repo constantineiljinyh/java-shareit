@@ -30,17 +30,19 @@ public class UserServiceImplTest {
 
     private UserService userService;
 
+    private User user;
+
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository);
+        user = new User();
+        user.setId(1);
+        user.setName("John");
+        user.setEmail("john@example.com");
     }
 
     @Test
     void testAddUser() {
-        User user = new User();
-        user.setName("John");
-        user.setEmail("john@example.com");
-
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         UserDto userDto = userService.addUser(user);
@@ -54,17 +56,12 @@ public class UserServiceImplTest {
 
     @Test
     void testGetAllUsers() {
-        User user1 = new User();
-        user1.setId(1);
-        user1.setName("John");
-        user1.setEmail("john@example.com");
-
         User user2 = new User();
         user2.setId(2);
         user2.setName("Alice");
         user2.setEmail("alice@example.com");
 
-        when(userRepository.findAll()).thenReturn(List.of(user1, user2));
+        when(userRepository.findAll()).thenReturn(List.of(user, user2));
 
         List<UserDto> userDtos = userService.getAllUsers();
 
@@ -72,9 +69,9 @@ public class UserServiceImplTest {
         assertEquals(2, userDtos.size());
 
         UserDto userDto1 = userDtos.get(0);
-        assertEquals(user1.getId(), userDto1.getId());
-        assertEquals(user1.getName(), userDto1.getName());
-        assertEquals(user1.getEmail(), userDto1.getEmail());
+        assertEquals(user.getId(), userDto1.getId());
+        assertEquals(user.getName(), userDto1.getName());
+        assertEquals(user.getEmail(), userDto1.getEmail());
 
         UserDto userDto2 = userDtos.get(1);
         assertEquals(user2.getId(), userDto2.getId());
@@ -87,10 +84,6 @@ public class UserServiceImplTest {
     @Test
     void testGetUserByIdValid() {
         int userId = 1;
-        User user = new User();
-        user.setId(userId);
-        user.setName("John");
-        user.setEmail("john@example.com");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
@@ -118,10 +111,6 @@ public class UserServiceImplTest {
     @Test
     void testRemoveUserValid() {
         int userId = 1;
-        User user = new User();
-        user.setId(userId);
-        user.setName("John");
-        user.setEmail("john@example.com");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
@@ -154,18 +143,12 @@ public class UserServiceImplTest {
     void testUpdateUserValid() {
         int userId = 1;
 
-        User existingUser = User.builder()
-                .id(userId)
-                .name("John")
-                .email("john@example.com")
-                .build();
-
         User updatedUser = User.builder()
                 .name("Updated Name")
                 .email("updated@example.com")
                 .build();
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         UserDto userDto = userService.updateUser(userId, updatedUser);
 
@@ -173,7 +156,6 @@ public class UserServiceImplTest {
         assertEquals(updatedUser.getName(), userDto.getName());
         assertEquals(updatedUser.getEmail(), userDto.getEmail());
 
-        verify(userRepository, times(1)).save(existingUser);
         verify(userRepository, times(1)).findById(userId);
     }
 
@@ -192,11 +174,6 @@ public class UserServiceImplTest {
 
     @Test
     void testUpdateUserConflict() {
-        User existingUser1 = new User();
-        existingUser1.setId(1);
-        existingUser1.setName("John");
-        existingUser1.setEmail("john@example.com");
-
         User existingUser2 = new User();
         existingUser2.setId(2);
         existingUser2.setName("Alice");
@@ -207,7 +184,7 @@ public class UserServiceImplTest {
         updatedUser.setName("Updated Name");
         updatedUser.setEmail("john@example.com");
 
-        when(userRepository.findAll()).thenReturn(List.of(existingUser1, existingUser2));
+        when(userRepository.findAll()).thenReturn(List.of(user, existingUser2));
         when(userRepository.findById(updatedUser.getId())).thenReturn(Optional.of(updatedUser));
 
         assertThrows(ConflictException.class, () -> {
@@ -221,41 +198,28 @@ public class UserServiceImplTest {
 
     @Test
     void testUpdateUserName() {
-        User existingUser = new User();
-        existingUser.setId(1);
-        existingUser.setName("John");
-        existingUser.setEmail("john@example.com");
-
         User updatedUser = new User();
         updatedUser.setName("Updated Name");
 
-        when(userRepository.findById(existingUser.getId())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        userService.updateUser(existingUser.getId(), updatedUser);
+        userService.updateUser(user.getId(), updatedUser);
 
-        verify(userRepository, times(1)).save(existingUser);
-
-        assertEquals(updatedUser.getName(), existingUser.getName());
-        assertEquals(existingUser.getEmail(), "john@example.com");
+        assertEquals(updatedUser.getName(), user.getName());
+        assertEquals(user.getEmail(), "john@example.com");
     }
 
     @Test
     void testUpdateUserEmail() {
-        User existingUser = new User();
-        existingUser.setId(1);
-        existingUser.setName("John");
-        existingUser.setEmail("john@example.com");
 
         User updatedUser = new User();
         updatedUser.setEmail("updated@example.com");
 
-        when(userRepository.findById(existingUser.getId())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        userService.updateUser(existingUser.getId(), updatedUser);
+        userService.updateUser(user.getId(), updatedUser);
 
-        verify(userRepository, times(1)).save(existingUser);
-
-        assertEquals(existingUser.getName(), "John");
-        assertEquals(updatedUser.getEmail(), existingUser.getEmail());
+        assertEquals(user.getName(), "John");
+        assertEquals(updatedUser.getEmail(), user.getEmail());
     }
 }

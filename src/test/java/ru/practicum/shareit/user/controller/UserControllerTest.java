@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jeasy.random.EasyRandom;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,6 +36,14 @@ class UserControllerTest {
     ObjectMapper mapper;
     private final EasyRandom random = new EasyRandom();
 
+    private UserDto userDto;
+
+    @BeforeEach
+    void setUp() {
+        userDto = random.nextObject(UserDto.class);
+        userDto.setEmail("yandex@yandex.ru");
+    }
+
     @Test
     void testGetAllUsers() throws Exception {
         List<UserDto> usersDto = random.objects(UserDto.class, 2).collect(Collectors.toList());
@@ -54,8 +63,6 @@ class UserControllerTest {
 
     @Test
     void testGetUserById() throws Exception {
-        UserDto userDto = random.nextObject(UserDto.class);
-        userDto.setEmail("yandex@yandex.ru");
         when(userService.getUserById(userDto.getId())).thenReturn(userDto);
 
         mvc.perform(get("/users/{userId}", userDto.getId()))
@@ -70,8 +77,6 @@ class UserControllerTest {
     @Test
     @DisplayName("Создание пользователя")
     void testAddUser() throws Exception {
-        UserDto userDto = random.nextObject(UserDto.class);
-        userDto.setEmail("yandex@yandex.ru");
         when(userService.addUser(Mockito.any(User.class))).thenReturn(userDto);
 
         mvc.perform(post("/users")
@@ -88,8 +93,6 @@ class UserControllerTest {
 
     @Test
     void testUpdateUser() throws Exception {
-        UserDto userDto = random.nextObject(UserDto.class);
-        userDto.setEmail("yandex@yandex.ru");
         when(userService.updateUser(Mockito.anyInt(), Mockito.any(User.class))).thenReturn(userDto);
 
         mvc.perform(patch("/users/{userId}", userDto.getId())
@@ -106,7 +109,7 @@ class UserControllerTest {
 
     @Test
     void testRemoveUser() throws Exception {
-        long userId = 1;
+        int userId = 1;
 
         mvc.perform(delete("/users/{userId}", userId))
                 .andExpect(status().isOk());

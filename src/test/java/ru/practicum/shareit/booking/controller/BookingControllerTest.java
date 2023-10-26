@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jeasy.random.EasyRandom;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.shareit.item.controller.ItemController.USER_ID_HEADER;
 
 @WebMvcTest(controllers = BookingController.class)
 class BookingControllerTest {
@@ -40,14 +42,21 @@ class BookingControllerTest {
 
     private final EasyRandom random = new EasyRandom();
 
+    private User user;
+
+    private BookingDto bookingDto;
+
+    @BeforeEach
+    void setUp() {
+        bookingDto = random.nextObject(BookingDto.class);
+        user = random.nextObject(User.class);
+        bookingDto.setStart(LocalDateTime.now().plusDays(1));
+        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
+    }
 
     @Test
     void testAddBooking() throws Exception {
         int userId = 1;
-        BookingDto bookingDto = random.nextObject(BookingDto.class);
-        User user = random.nextObject(User.class);
-        bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.setBooker(user);
         BookingFullDto bookingFullDto = BookingMapper.toBookingFullDto(booking);
@@ -55,7 +64,7 @@ class BookingControllerTest {
         when(bookingService.createBooking(Mockito.anyInt(), Mockito.any(Booking.class))).thenReturn(bookingFullDto);
 
         mvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(USER_ID_HEADER, userId)
                         .content(mapper.writeValueAsString(bookingDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -69,10 +78,6 @@ class BookingControllerTest {
     @Test
     void testApprovedOrRejectedBooking() throws Exception {
         int userId = 1;
-        BookingDto bookingDto = random.nextObject(BookingDto.class);
-        User user = random.nextObject(User.class);
-        bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.setBooker(user);
         BookingFullDto bookingFullDto = BookingMapper.toBookingFullDto(booking);
@@ -80,7 +85,7 @@ class BookingControllerTest {
         when(bookingService.updateBookingStatus(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyBoolean())).thenReturn(bookingFullDto);
 
         mvc.perform(patch("/bookings/{bookingId}", booking.getId())
-                        .header("X-Sharer-User-Id", userId)
+                        .header(USER_ID_HEADER, userId)
                         .content(mapper.writeValueAsString(bookingDto))
                         .param("approved", String.valueOf(true))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -95,10 +100,6 @@ class BookingControllerTest {
     @Test
     void testGetBookingById() throws Exception {
         int userId = 1;
-        BookingDto bookingDto = random.nextObject(BookingDto.class);
-        User user = random.nextObject(User.class);
-        bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.setBooker(user);
         BookingFullDto bookingFullDto = BookingMapper.toBookingFullDto(booking);
@@ -106,7 +107,7 @@ class BookingControllerTest {
         when(bookingService.getBookingById(Mockito.anyInt(), Mockito.anyInt())).thenReturn(bookingFullDto);
 
         mvc.perform(get("/bookings/{bookingId}", booking.getId())
-                        .header("X-Sharer-User-Id", userId)
+                        .header(USER_ID_HEADER, userId)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL_VALUE))
@@ -119,10 +120,6 @@ class BookingControllerTest {
     @Test
     void testGetBookingsByBookerId() throws Exception {
         int userId = 1;
-        BookingDto bookingDto = random.nextObject(BookingDto.class);
-        User user = random.nextObject(User.class);
-        bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.setBooker(user);
         BookingFullDto bookingFullDto = BookingMapper.toBookingFullDto(booking);
@@ -131,7 +128,7 @@ class BookingControllerTest {
         when(bookingService.getBookingsByBookerId(Mockito.anyInt(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(bookingFullDtoList);
 
         mvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(USER_ID_HEADER, userId)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL_VALUE))
@@ -144,10 +141,6 @@ class BookingControllerTest {
     @Test
     void testGetAllBookingsForItemsByOwnerId() throws Exception {
         int userId = 1;
-        BookingDto bookingDto = random.nextObject(BookingDto.class);
-        User user = random.nextObject(User.class);
-        bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.setBooker(user);
         BookingFullDto bookingFullDto = BookingMapper.toBookingFullDto(booking);
@@ -156,7 +149,7 @@ class BookingControllerTest {
         when(bookingService.getAllBookingsForItemsByOwnerId(Mockito.anyInt(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(bookingFullDtoList);
 
         mvc.perform(get("/bookings/owner")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(USER_ID_HEADER, userId)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL_VALUE))

@@ -53,16 +53,24 @@ class BookingServiceImplTest {
 
     private final LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
 
+    private User user;
+
+    private Item item;
+
+    private User booker;
+
     @BeforeEach
     void setUp() {
         bookingService = new BookingServiceImpl(bookingRepository, userService, itemService);
+        user = random.nextObject(User.class);
+        item = random.nextObject(Item.class);
+        booker = random.nextObject(User.class);
+
     }
 
     @Test
     void testCreateBooking() {
         int userId = 1;
-        User user = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = new Booking(1, yesterday, tomorrow, item, user, Status.WAITING);
         ItemDto itemDto = ItemMapper.toItemDto(item);
         when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
@@ -77,8 +85,6 @@ class BookingServiceImplTest {
     @Test
     void shouldThrowExceptionWhenAddBookingIfBookingStartIsNull() {
         int userId = 1;
-        User user = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = new Booking(1, null, tomorrow, item, user, Status.WAITING);
         when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
 
@@ -88,8 +94,6 @@ class BookingServiceImplTest {
     @Test
     void shouldThrowExceptionWhenAddBookingIfBookingEndIsNull() {
         int userId = 1;
-        User user = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = new Booking(1, yesterday, null, item, user, Status.WAITING);
         when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
 
@@ -99,8 +103,6 @@ class BookingServiceImplTest {
     @Test
     void shouldThrowExceptionWhenAddBookingIfBookingStartIsAfterBookingEnd() {
         int userId = 1;
-        User user = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = new Booking(1, tomorrow, yesterday, item, user, Status.WAITING);
         when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
 
@@ -110,8 +112,6 @@ class BookingServiceImplTest {
     @Test
     void shouldThrowExceptionWhenAddBookingIfBookingStartIsEqualBookingEnd() {
         int userId = 1;
-        User user = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = new Booking(1, tomorrow, tomorrow, item, user, Status.WAITING);
         when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
 
@@ -121,8 +121,6 @@ class BookingServiceImplTest {
     @Test
     void shouldThrowExceptionWhenAddBookingIfItemDoesNotExist() {
         int userId = 1;
-        User user = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = new Booking(1, yesterday, tomorrow, item, user, Status.WAITING);
 
         when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
@@ -135,8 +133,6 @@ class BookingServiceImplTest {
     @Test
     void shouldThrowExceptionWhenAddBookingIfUserDoesNotExist() {
         int userId = 1;
-        User user = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = new Booking(1, yesterday, tomorrow, item, user, Status.WAITING);
 
         when(userService.getUserById(userId)).thenThrow(NotFoundException.class);
@@ -146,8 +142,6 @@ class BookingServiceImplTest {
     @Test
     void shouldThrowExceptionWhenAddBookingIfOwnerIsEqualBooker() {
         int userId = 1;
-        User user = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = new Booking(1, yesterday, tomorrow, item, user, Status.WAITING);
 
         booking.setItem(item);
@@ -164,8 +158,6 @@ class BookingServiceImplTest {
     @Test
     void shouldThrowValidationExceptionWhenOwnerNotFound() {
         int userId = 1;
-        User user = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = new Booking(1, yesterday, tomorrow, item, user, Status.WAITING);
         ItemDto itemDto = ItemMapper.toItemDto(item);
         itemDto.setOwner(null);
@@ -178,8 +170,6 @@ class BookingServiceImplTest {
     @Test
     void shouldThrowExceptionWhenAddBookingIfItemNotAvailable() {
         int userId = 1;
-        User user = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = new Booking(1, yesterday, tomorrow, item, user, Status.WAITING);
         ItemDto itemDto = ItemMapper.toItemDto(item);
         itemDto.setAvailable(false);
@@ -193,11 +183,8 @@ class BookingServiceImplTest {
 
     @Test
     void testUpdateBookingStatus() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = random.nextObject(Booking.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         booking.setItem(item);
         booking.setBooker(booker);
 
@@ -205,50 +192,41 @@ class BookingServiceImplTest {
         when(bookingRepository.save(Mockito.any())).thenReturn(booking);
 
         booking.setStatus(Status.WAITING);
-        BookingFullDto bookingFullDtoFromMethod = bookingService.updateBookingStatus(owner.getId(), booking.getId(), true);
+        BookingFullDto bookingFullDtoFromMethod = bookingService.updateBookingStatus(user.getId(), booking.getId(), true);
         assertEquals(Status.APPROVED, bookingFullDtoFromMethod.getStatus());
 
         booking.setStatus(Status.WAITING);
-        bookingFullDtoFromMethod = bookingService.updateBookingStatus(owner.getId(), booking.getId(), false);
+        bookingFullDtoFromMethod = bookingService.updateBookingStatus(user.getId(), booking.getId(), false);
         assertEquals(Status.REJECTED, bookingFullDtoFromMethod.getStatus());
     }
 
     @Test
     void shouldThrowExceptionWhenApprovedOrRejectedBookingIfBookingDoesNotExist() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = random.nextObject(Booking.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         booking.setItem(item);
         booking.setBooker(booker);
 
         when(bookingRepository.findById(Mockito.anyInt())).thenThrow(NotFoundException.class);
 
-        assertThrows(NotFoundException.class, () -> bookingService.updateBookingStatus(owner.getId(), booking.getId(), true));
+        assertThrows(NotFoundException.class, () -> bookingService.updateBookingStatus(user.getId(), booking.getId(), true));
     }
 
     @Test
     void shouldThrowExceptionWhenApprovedOrRejectedBookingIfStatusChangeIsNotPossible() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = random.nextObject(Booking.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         booking.setItem(item);
         booking.setBooker(booker);
 
         when(bookingRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(booking));
         when(bookingRepository.existsBookingByIdAndStatusNot(Mockito.anyInt(), Mockito.any(Status.class))).thenReturn(true);
 
-        assertThrows(ValidationException.class, () -> bookingService.updateBookingStatus(owner.getId(), booking.getId(), true));
+        assertThrows(ValidationException.class, () -> bookingService.updateBookingStatus(user.getId(), booking.getId(), true));
     }
 
     @Test
     void shouldThrowExceptionWhenApprovedOrRejectedBookingIfItemDoesNotBelongConfirmingUser() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = random.nextObject(Booking.class);
         booking.setItem(item);
         booking.setBooker(booker);
@@ -256,16 +234,13 @@ class BookingServiceImplTest {
 
         when(bookingRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(booking));
         when(bookingRepository.existsBookingByIdAndStatusNot(Mockito.anyInt(), Mockito.any(Status.class))).thenReturn(false);
-        assertThrows(NotFoundException.class, () -> bookingService.updateBookingStatus(owner.getId(), booking.getId(), true));
+        assertThrows(NotFoundException.class, () -> bookingService.updateBookingStatus(user.getId(), booking.getId(), true));
     }
 
     @Test
     void getBookingById() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = random.nextObject(Booking.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         booking.setItem(item);
         booking.setBooker(booker);
 
@@ -279,11 +254,8 @@ class BookingServiceImplTest {
 
     @Test
     void shouldThrowExceptionWhenGetBookingByIdIfBookingDoesNotExist() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = random.nextObject(Booking.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         booking.setItem(item);
         booking.setBooker(booker);
 
@@ -293,11 +265,8 @@ class BookingServiceImplTest {
     @Test
     @DisplayName("Получение ошибки при получении бронирования по id, когда нет доступа для просмотра бронирования")
     void shouldThrowExceptionWhenGetBookingByIdIfNoAccessToViewBooking() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
         Booking booking = random.nextObject(Booking.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         booking.setItem(item);
         booking.setBooker(booker);
 
@@ -308,10 +277,7 @@ class BookingServiceImplTest {
 
     @Test
     void getBookingsByBookerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -330,10 +296,7 @@ class BookingServiceImplTest {
 
     @Test
     void getCurrentBookingsByBookerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -353,10 +316,7 @@ class BookingServiceImplTest {
 
     @Test
     void getPastBookingsByBookerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -376,10 +336,7 @@ class BookingServiceImplTest {
 
     @Test
     void getFutureBookingsByBookerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -399,10 +356,7 @@ class BookingServiceImplTest {
 
     @Test
     void getBookingsWithStatusIsWaitingByBookerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -422,10 +376,7 @@ class BookingServiceImplTest {
 
     @Test
     void getBookingsWithStatusIsRejectedByBookerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -445,7 +396,6 @@ class BookingServiceImplTest {
 
     @Test
     void shouldThrowExceptionWhenGetBookingsWithIsUnsupportedStatusByBookerId() {
-        User booker = random.nextObject(User.class);
         when(userService.getUserById(booker.getId())).thenReturn(UserMapper.toUserDto(booker));
 
         assertThrows(IllegalArgumentException.class, () -> bookingService.getBookingsByBookerId(booker.getId(), "UNSUPPORTED STATUS", 0, 5));
@@ -453,16 +403,12 @@ class BookingServiceImplTest {
 
     @Test
     void testCheckSize() {
-        User booker = random.nextObject(User.class);
         assertThrows(ValidationException.class, () -> bookingService.getBookingsByBookerId(booker.getId(), "UNSUPPORTED STATUS", -1, 0));
     }
 
     @Test
     void getAllBookingsForItemsByOwnerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -473,18 +419,15 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(owner.getId())).thenReturn(UserMapper.toUserDto(owner));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdOrderByStartDesc(Mockito.anyInt(), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
-        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(owner.getId(), "ALL", 0, 5));
+        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(user.getId(), "ALL", 0, 5));
     }
 
     @Test
     void getAllCurrentBookingsForItemsByOwnerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -495,19 +438,16 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(owner.getId())).thenReturn(UserMapper.toUserDto(owner));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(LocalDateTime.class), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
-        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(owner.getId(), "CURRENT", 0, 5));
+        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(user.getId(), "CURRENT", 0, 5));
     }
 
     @Test
     void getAllPastBookingsForItemsByOwnerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -518,19 +458,16 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(owner.getId())).thenReturn(UserMapper.toUserDto(owner));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdAndEndBeforeOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
-        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(owner.getId(), "PAST", 0, 5));
+        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(user.getId(), "PAST", 0, 5));
     }
 
     @Test
     void getAllFutureBookingsForItemsByOwnerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -541,19 +478,16 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(owner.getId())).thenReturn(UserMapper.toUserDto(owner));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdAndStartAfterOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
-        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(owner.getId(), "FUTURE", 0, 5));
+        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(user.getId(), "FUTURE", 0, 5));
     }
 
     @Test
     void getAllBookingsForItemsWithStatusIsWaitingByOwnerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -564,19 +498,16 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(owner.getId())).thenReturn(UserMapper.toUserDto(owner));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(Status.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
-        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(owner.getId(), "WAITING", 0, 5));
+        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(user.getId(), "WAITING", 0, 5));
     }
 
     @Test
     void getAllBookingsForItemsWithStatusIsRejectedByOwnerId() {
-        User owner = random.nextObject(User.class);
-        User booker = random.nextObject(User.class);
-        Item item = random.nextObject(Item.class);
-        item.setOwner(owner);
+        item.setOwner(user);
         List<Booking> bookings = random.objects(Booking.class, 5)
                 .peek(booking -> {
                     booking.setBooker(booker);
@@ -587,19 +518,18 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(owner.getId())).thenReturn(UserMapper.toUserDto(owner));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(Status.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
-        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(owner.getId(), "REJECTED", 0, 5));
+        assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(user.getId(), "REJECTED", 0, 5));
     }
 
     @Test
     void shouldThrowExceptionWhenGetBookingsWithIsUnsupportedStatusByOwnerId() {
-        User owner = random.nextObject(User.class);
-        when(userService.getUserById(owner.getId())).thenReturn(UserMapper.toUserDto(owner));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
 
-        assertThrows(IllegalArgumentException.class, () -> bookingService.getAllBookingsForItemsByOwnerId(owner.getId(), "UNSUPPORTED STATUS", 0, 5));
+        assertThrows(IllegalArgumentException.class, () -> bookingService.getAllBookingsForItemsByOwnerId(user.getId(), "UNSUPPORTED STATUS", 0, 5));
     }
 
 }

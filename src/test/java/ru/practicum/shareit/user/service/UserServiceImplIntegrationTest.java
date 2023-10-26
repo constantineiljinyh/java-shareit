@@ -18,7 +18,6 @@ public class UserServiceImplIntegrationTest {
     private UserService userService;
     private final EasyRandom random = new EasyRandom();
 
-
     @Test
     @DirtiesContext
     void addUser() {

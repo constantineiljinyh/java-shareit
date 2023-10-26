@@ -94,7 +94,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         log.info("Вещь с ID {} успешно обновлена", itemId);
-        return ItemMapper.toItemDto(itemRepository.save(existingItem));
+        return ItemMapper.toItemDto(existingItem);
     }
 
     @Override
