@@ -2,6 +2,9 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingFullDto;
@@ -104,70 +107,76 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingFullDto> getBookingsByBookerId(int bookerId, String state) {
+    public List<BookingFullDto> getBookingsByBookerId(int bookerId, String state, int from, int size) {
+        checkSize(size, from);
         log.info("Пришел запрос получение списка всех бронирований текущего пользователя {} брони", bookerId);
         userService.getUserById(bookerId);
+        Pageable pageable = PageRequest.of(from / size, size);
         State stateBooking = State.valueOf(state);
+
+        Page<Booking> bookingsPage;
+
         switch (stateBooking) {
             case ALL:
-                return bookingRepository.findAllByBookerIdOrderByStartDesc(bookerId).stream()
-                        .map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
+                bookingsPage = bookingRepository.findAllByBookerIdOrderByStartDesc(bookerId, pageable);
+                break;
             case CURRENT:
-                return bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-                        bookerId, LocalDateTime.now(), LocalDateTime.now()
-                ).stream().map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
+                bookingsPage = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
+                        bookerId, LocalDateTime.now(), LocalDateTime.now(), pageable);
+                break;
             case PAST:
-                return bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(bookerId, LocalDateTime.now()).stream()
-                        .map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
+                bookingsPage = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(bookerId, LocalDateTime.now(), pageable);
+                break;
             case FUTURE:
-                return bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(bookerId, LocalDateTime.now()).stream()
-                        .map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
+                bookingsPage = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(bookerId, LocalDateTime.now(), pageable);
+                break;
             case WAITING:
-                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(bookerId, Status.WAITING).stream()
-                        .map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
+                bookingsPage = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(bookerId, Status.WAITING, pageable);
+                break;
             case REJECTED:
-                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(bookerId, Status.REJECTED).stream()
-                        .map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
-            case UNSUPPORTED_STATUS:
+                bookingsPage = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(bookerId, Status.REJECTED, pageable);
+                break;
+            default:
                 log.error("Пришел запрос с UNSUPPORTED_STATUS");
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
-            default:
-                log.error("Пришел запрос с неизвестным статусом бронирования");
-                throw new ValidationException("Неизвестный статус бронирования");
         }
+
+        return bookingsPage.getContent().stream()
+                .map(BookingMapper::toBookingFullDto)
+                .collect(Collectors.toList());
     }
 
+
     @Override
-    public List<BookingFullDto> getAllBookingsForItemsByOwnerId(int ownerId, String state) {
+    public List<BookingFullDto> getAllBookingsForItemsByOwnerId(int ownerId, String state, int from, int size) {
+        checkSize(size, from);
         log.info("Пришел запрос Получение списка бронирований для всех вещей текущего пользователя {} ", ownerId);
         userService.getUserById(ownerId);
+        Pageable pageable = PageRequest.of(from / size, size);
         State stateBooking = State.valueOf(state);
         switch (stateBooking) {
             case ALL:
-                return bookingRepository.findAllByItem_OwnerIdOrderByStartDesc(ownerId).stream()
+                return bookingRepository.findAllByItem_OwnerIdOrderByStartDesc(ownerId, pageable).stream()
                         .map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
             case CURRENT:
                 return bookingRepository.findAllByItem_OwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-                        ownerId, LocalDateTime.now(), LocalDateTime.now()
+                        ownerId, LocalDateTime.now(), LocalDateTime.now(), pageable
                 ).stream().map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
             case PAST:
-                return bookingRepository.findAllByItem_OwnerIdAndEndBeforeOrderByStartDesc(ownerId, LocalDateTime.now()).stream()
+                return bookingRepository.findAllByItem_OwnerIdAndEndBeforeOrderByStartDesc(ownerId, LocalDateTime.now(), pageable).stream()
                         .map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
             case FUTURE:
-                return bookingRepository.findAllByItem_OwnerIdAndStartAfterOrderByStartDesc(ownerId, LocalDateTime.now()).stream()
+                return bookingRepository.findAllByItem_OwnerIdAndStartAfterOrderByStartDesc(ownerId, LocalDateTime.now(), pageable).stream()
                         .map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
             case WAITING:
-                return bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(ownerId, Status.WAITING).stream()
+                return bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(ownerId, Status.WAITING, pageable).stream()
                         .map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
             case REJECTED:
-                return bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(ownerId, Status.REJECTED).stream()
+                return bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(ownerId, Status.REJECTED, pageable).stream()
                         .map(BookingMapper::toBookingFullDto).collect(Collectors.toList());
-            case UNSUPPORTED_STATUS:
+            default:
                 log.error("Пришел запрос с UNSUPPORTED_STATUS");
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
-            default:
-                log.error("Пришел запрос с неизвестным статусом бронирования");
-                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
@@ -195,6 +204,12 @@ public class BookingServiceImpl implements BookingService {
             String errorMessage = "Даты начала и окончания бронирования не могут совпадать";
             log.error(errorMessage);
             throw new ValidationException(errorMessage);
+        }
+    }
+
+    private void checkSize(int size, int from) {
+        if (size < 1 || from < 0) {
+            throw new ValidationException("Некорректный размер");
         }
     }
 }

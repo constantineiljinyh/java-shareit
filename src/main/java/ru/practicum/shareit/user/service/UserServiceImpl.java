@@ -63,13 +63,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(int userId, User user) {
         Optional<User> optionalUser = userRepository.findById(userId);
-
         if (optionalUser.isEmpty()) {
             log.error("Пользователь с ID {} не найден", userId);
             throw new NotFoundException("Пользователь с ID " + userId + " не найден");
         }
         User existingUser = optionalUser.get();
-        checkUserByIdAndEmail(existingUser);
+        user.setId(userId);
+        checkUserByIdAndEmail(user);
         if (user.getName() != null) {
             existingUser.setName(user.getName());
         }
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
             existingUser.setEmail(user.getEmail());
         }
         log.info("Пользователь с ID {} успешно обновлен", userId);
-        return UserMapper.toUserDto(userRepository.save(existingUser));
+        return UserMapper.toUserDto(existingUser);
     }
 
     public void checkUserByIdAndEmail(User user) {

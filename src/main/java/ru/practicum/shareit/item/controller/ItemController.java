@@ -22,6 +22,8 @@ import ru.practicum.shareit.validate.Create;
 import ru.practicum.shareit.validate.Update;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -35,38 +37,42 @@ public class ItemController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemDto addItem(@RequestHeader(USER_ID_HEADER) int userId,
+    public ItemDto addItem(@RequestHeader(USER_ID_HEADER) Integer userId,
                            @Validated(Create.class) @RequestBody ItemDto itemDto) {
-        return itemService.addItem(userId, ItemMapper.toItem(itemDto));
+        return itemService.addItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@PathVariable int itemId,
-                              @RequestHeader(USER_ID_HEADER) int userId,
+    public ItemDto updateItem(@PathVariable Integer itemId,
+                              @RequestHeader(USER_ID_HEADER) Integer userId,
                               @Validated(Update.class) @RequestBody ItemDto itemDto) {
         return itemService.updateItem(itemId, userId, ItemMapper.toItem(itemDto));
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@RequestHeader(USER_ID_HEADER) int userId, @PathVariable int itemId) {
+    public ItemDto getItem(@RequestHeader(USER_ID_HEADER) Integer userId, @PathVariable Integer itemId) {
         return itemService.getItem(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) int ownerId) {
-        return itemService.getItemsByOwnerId(ownerId);
+    public List<ItemDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Integer ownerId,
+                                           @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                           @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return itemService.getItemsByOwnerId(ownerId, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentFullDto addComment(@RequestHeader(USER_ID_HEADER) int userId,
-                                     @PathVariable int itemId,
+    public CommentFullDto addComment(@RequestHeader(USER_ID_HEADER) Integer userId,
+                                     @PathVariable Integer itemId,
                                      @Valid @RequestBody CommentDto commentDto) {
 
         return itemService.addComment(userId, itemId, commentDto);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestParam String text) {
-        return itemService.searchItems(text);
+    public List<ItemDto> searchItems(@RequestParam String text,
+                                     @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                     @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return itemService.searchItems(text, from, size);
     }
 }

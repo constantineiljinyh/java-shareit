@@ -11,15 +11,6 @@ import ru.practicum.shareit.user.dto.UserShortDto;
 @UtilityClass
 public class BookingMapper {
 
-    public BookingDto toBookingDto(Booking booking) {
-        return BookingDto.builder()
-                .id(booking.getId())
-                .start(booking.getStart())
-                .end(booking.getEnd())
-                .itemId(booking.getItem().getId())
-                .build();
-    }
-
     public BookingShortDto bookingShortDto(Booking booking) {
         return BookingShortDto.builder()
                 .id(booking.getId())
