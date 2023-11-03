@@ -62,7 +62,7 @@ public class ItemServiceImpl implements ItemService {
                 throw new NotFoundException("Запрос id " + itemDto.getRequestId() + " не найден");
             }
         }
-        User user = UserMapper.toUser(userService.getUserById(userId));
+        User user = UserMapper.INSTANCE.toUser(userService.getUserById(userId));
         item.setOwner(user);
         log.info("Пришел запрос на создание вещи name {}", item.getName());
         itemRepository.save(item);
@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(Integer itemId, Integer userId, Item item) {
         item.setId(itemId);
-        User user = UserMapper.toUser(userService.getUserById(userId));
+        User user = UserMapper.INSTANCE.toUser(userService.getUserById(userId));
         item.setOwner(user);
         Optional<Item> optionalItem = itemRepository.findById(itemId);
 
@@ -158,7 +158,7 @@ public class ItemServiceImpl implements ItemService {
         log.info("Пришел запрос на создание комментария, пользователем {} к вещи {}", userId, itemId);
         LocalDateTime currentTime = LocalDateTime.now();
         checkBookingByItemAndUserAndStatusAndPast(userId, itemId);
-        User author = UserMapper.toUser(userService.getUserById(userId));
+        User author = UserMapper.INSTANCE.toUser(userService.getUserById(userId));
         Optional<Item> optionalItem = itemRepository.findById(itemId);
         Item item = optionalItem.orElseThrow(() -> new NotFoundException("Вещь id " + itemId + " не найдена"));
         Comment comment = CommentMapper.toComment(commentDto);

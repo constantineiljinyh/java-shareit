@@ -43,7 +43,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingFullDto createBooking(int userId, Booking booking) {
         log.info("Пришел запрос на создание пользователем {} брони", userId);
-        User user = UserMapper.toUser(userService.getUserById(userId));
+        User user = UserMapper.INSTANCE.toUser(userService.getUserById(userId));
         checkDateEndIsAfterStart(booking);
         Integer itemId = booking.getItem().getId();
         Item item = ItemMapper.toItem(itemService.getItem(userId, itemId));

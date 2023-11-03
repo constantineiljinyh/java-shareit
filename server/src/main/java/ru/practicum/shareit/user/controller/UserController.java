@@ -27,7 +27,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping()
     public UserDto addUser(@RequestBody UserDto userDto) {
-        return userService.addUser(UserMapper.toUser(userDto));
+        return userService.addUser(UserMapper.INSTANCE.toUser(userDto));
     }
 
     @GetMapping
@@ -48,6 +48,6 @@ public class UserController {
     @PatchMapping("/{userId}")
     public UserDto updateUser(@PathVariable("userId") int userId,
                               @RequestBody UserDto userDto) {
-        return userService.updateUser(userId, UserMapper.toUser(userDto));
+        return userService.updateUser(userId, UserMapper.INSTANCE.toUser(userDto));
     }
 }

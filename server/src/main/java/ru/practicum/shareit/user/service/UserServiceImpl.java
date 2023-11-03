@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto addUser(User user) {
         log.info("Пришел запрос на создание пользователя name {}", user.getName());
-        return UserMapper.toUserDto(userRepository.save(user));
+        return UserMapper.INSTANCE.toUserDto(userRepository.save(user));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
         Collection<User> userList = userRepository.findAll();
 
         return userList.stream()
-                .map(UserMapper::toUserDto)
+                .map(UserMapper.INSTANCE::toUserDto)
                 .collect(Collectors.toList());
     }
 
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
         log.info("Пришел запрос на получение пользователя id {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
-        return UserMapper.toUserDto(user);
+        return UserMapper.INSTANCE.toUserDto(user);
     }
 
     @Transactional
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
 
         userRepository.delete(user);
-        return UserMapper.toUserDto(user);
+        return UserMapper.INSTANCE.toUserDto(user);
     }
 
     @Transactional
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
             existingUser.setEmail(user.getEmail());
         }
         log.info("Пользователь с ID {} успешно обновлен", userId);
-        return UserMapper.toUserDto(existingUser);
+        return UserMapper.INSTANCE.toUserDto(existingUser);
     }
 
     public void checkUserByIdAndEmail(User user) {

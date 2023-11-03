@@ -43,7 +43,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         UserDto userDto = userService.getUserById(userId);
         ItemRequest itemRequest = ItemRequest.builder()
                 .description(itemRequestDto.getDescription())
-                .requestor(UserMapper.toUser(userDto))
+                .requestor(UserMapper.INSTANCE.toUser(userDto))
                 .created(LocalDateTime.now())
                 .build();
 
@@ -53,7 +53,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestFullDto> getUserRequests(int userId) {
-        User user = UserMapper.toUser(userService.getUserById(userId));
+        User user = UserMapper.INSTANCE.toUser(userService.getUserById(userId));
         List<ItemRequest> requests = itemRequestRepository.findByRequestorIdOrderByCreatedDesc(userId);
 
         List<ItemRequestFullDto> result = new ArrayList<>();

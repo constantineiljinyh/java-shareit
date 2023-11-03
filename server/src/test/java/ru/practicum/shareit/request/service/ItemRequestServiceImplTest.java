@@ -99,11 +99,11 @@ class ItemRequestServiceImplTest {
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setId(1);
         itemRequest.setDescription("Test item request description");
-        itemRequest.setRequestor(UserMapper.toUser(userDto));
+        itemRequest.setRequestor(UserMapper.INSTANCE.toUser(userDto));
         itemRequest.setCreated(LocalDateTime.now());
 
         Item item1 = Item.builder()
-                .owner(UserMapper.toUser(userDto))
+                .owner(UserMapper.INSTANCE.toUser(userDto))
                 .name("Item 1")
                 .description("Description 1")
                 .available(true)
@@ -140,12 +140,12 @@ class ItemRequestServiceImplTest {
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setId(1);
         itemRequest.setDescription("Test item request description");
-        itemRequest.setRequestor(UserMapper.toUser(userDto2));
+        itemRequest.setRequestor(UserMapper.INSTANCE.toUser(userDto2));
         itemRequest.setCreated(LocalDateTime.now());
 
         Item item1 = Item.builder()
                 .id(1)
-                .owner(UserMapper.toUser(userDto2))
+                .owner(UserMapper.INSTANCE.toUser(userDto2))
                 .name("Item 1")
                 .description("Description 1")
                 .available(true)
@@ -180,12 +180,12 @@ class ItemRequestServiceImplTest {
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setId(1);
         itemRequest.setDescription("Test item request description");
-        itemRequest.setRequestor(UserMapper.toUser(userDto));
+        itemRequest.setRequestor(UserMapper.INSTANCE.toUser(userDto));
         itemRequest.setCreated(LocalDateTime.now());
 
         Item item1 = Item.builder()
                 .id(1)
-                .owner(UserMapper.toUser(userDto))
+                .owner(UserMapper.INSTANCE.toUser(userDto))
                 .name("Item 1")
                 .description("Description 1")
                 .available(true)

@@ -46,7 +46,7 @@ class ItemRequestControllerTest {
         UserDto userDto = random.nextObject(UserDto.class);
         ItemRequest itemRequest = ItemRequest.builder()
                 .description(itemRequestDto.getDescription())
-                .requestor(UserMapper.toUser(userDto))
+                .requestor(UserMapper.INSTANCE.toUser(userDto))
                 .created(LocalDateTime.now())
                 .build();
         ItemRequestFullDto itemRequestFullDto = RequestMapper.toItemRequestDto(itemRequest);

@@ -100,7 +100,7 @@ class ItemServiceImplTest {
         existingItem.setName("Drill");
         existingItem.setDescription("Drill Description");
         existingItem.setAvailable(true);
-        existingItem.setOwner(UserMapper.toUser(userDto));
+        existingItem.setOwner(UserMapper.INSTANCE.toUser(userDto));
     }
 
     @Test
@@ -274,7 +274,7 @@ class ItemServiceImplTest {
         Item item = random.nextObject(Item.class);
         CommentDto commentCreateDto = random.nextObject(CommentDto.class);
         Comment comment = CommentMapper.toComment(commentCreateDto);
-        comment.setAuthorName(UserMapper.toUser(user));
+        comment.setAuthorName(UserMapper.INSTANCE.toUser(user));
         comment.setItem(item);
         LocalDateTime currentTime = LocalDateTime.now();
         comment.setCreated(currentTime);

@@ -73,7 +73,7 @@ class BookingServiceImplTest {
         int userId = 1;
         Booking booking = new Booking(1, yesterday, tomorrow, item, user, Status.WAITING);
         ItemDto itemDto = ItemMapper.toItemDto(item);
-        when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(userId)).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(itemService.getItem(userId, booking.getItem().getId())).thenReturn(itemDto);
         when(bookingRepository.save(Mockito.any())).thenReturn(booking);
         BookingFullDto bookingFullDto = BookingMapper.toBookingFullDto(booking);
@@ -86,7 +86,7 @@ class BookingServiceImplTest {
     void shouldThrowExceptionWhenAddBookingIfBookingStartIsNull() {
         int userId = 1;
         Booking booking = new Booking(1, null, tomorrow, item, user, Status.WAITING);
-        when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(userId)).thenReturn(UserMapper.INSTANCE.toUserDto(user));
 
         assertThrows(NotFoundException.class, () -> bookingService.createBooking(userId, booking));
     }
@@ -95,7 +95,7 @@ class BookingServiceImplTest {
     void shouldThrowExceptionWhenAddBookingIfBookingEndIsNull() {
         int userId = 1;
         Booking booking = new Booking(1, yesterday, null, item, user, Status.WAITING);
-        when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(userId)).thenReturn(UserMapper.INSTANCE.toUserDto(user));
 
         assertThrows(NotFoundException.class, () -> bookingService.createBooking(userId, booking));
     }
@@ -104,7 +104,7 @@ class BookingServiceImplTest {
     void shouldThrowExceptionWhenAddBookingIfBookingStartIsAfterBookingEnd() {
         int userId = 1;
         Booking booking = new Booking(1, tomorrow, yesterday, item, user, Status.WAITING);
-        when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(userId)).thenReturn(UserMapper.INSTANCE.toUserDto(user));
 
         assertThrows(ValidationException.class, () -> bookingService.createBooking(userId, booking));
     }
@@ -113,7 +113,7 @@ class BookingServiceImplTest {
     void shouldThrowExceptionWhenAddBookingIfBookingStartIsEqualBookingEnd() {
         int userId = 1;
         Booking booking = new Booking(1, tomorrow, tomorrow, item, user, Status.WAITING);
-        when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(userId)).thenReturn(UserMapper.INSTANCE.toUserDto(user));
 
         assertThrows(ValidationException.class, () -> bookingService.createBooking(userId, booking));
     }
@@ -123,7 +123,7 @@ class BookingServiceImplTest {
         int userId = 1;
         Booking booking = new Booking(1, yesterday, tomorrow, item, user, Status.WAITING);
 
-        when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(userId)).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(itemService.getItem(Mockito.anyInt(), Mockito.anyInt())).thenThrow(NotFoundException.class);
 
 
@@ -149,7 +149,7 @@ class BookingServiceImplTest {
         item.setOwner(user);
         ItemDto itemDto = ItemMapper.toItemDto(item);
 
-        when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(userId)).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(itemService.getItem(userId, booking.getItem().getId())).thenReturn(itemDto);
 
         assertThrows(NotFoundException.class, () -> bookingService.createBooking(userId, booking));
@@ -161,7 +161,7 @@ class BookingServiceImplTest {
         Booking booking = new Booking(1, yesterday, tomorrow, item, user, Status.WAITING);
         ItemDto itemDto = ItemMapper.toItemDto(item);
         itemDto.setOwner(null);
-        when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(userId)).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(itemService.getItem(userId, booking.getItem().getId())).thenReturn(itemDto);
 
         assertThrows(ValidationException.class, () -> bookingService.createBooking(userId, booking));
@@ -175,7 +175,7 @@ class BookingServiceImplTest {
         itemDto.setAvailable(false);
 
 
-        when(userService.getUserById(userId)).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(userId)).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(itemService.getItem(userId, booking.getItem().getId())).thenReturn(itemDto);
 
         assertThrows(ValidationException.class, () -> bookingService.createBooking(userId, booking));
@@ -288,7 +288,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.toUserDto(booker));
+        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(booker));
         when(bookingRepository.findAllByBookerIdOrderByStartDesc(Mockito.anyInt(), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
         assertEquals(bookingsFullDto, bookingService.getBookingsByBookerId(booker.getId(), "ALL", 0, 5));
@@ -307,7 +307,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.toUserDto(booker));
+        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(booker));
         when(bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(LocalDateTime.class), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
@@ -327,7 +327,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.toUserDto(booker));
+        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(booker));
         when(bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
@@ -347,7 +347,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.toUserDto(booker));
+        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(booker));
         when(bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
@@ -367,7 +367,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.toUserDto(booker));
+        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(booker));
         when(bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(Status.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
@@ -387,7 +387,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.toUserDto(booker));
+        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(booker));
         when(bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(Status.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
@@ -396,7 +396,7 @@ class BookingServiceImplTest {
 
     @Test
     void shouldThrowExceptionWhenGetBookingsWithIsUnsupportedStatusByBookerId() {
-        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.toUserDto(booker));
+        when(userService.getUserById(booker.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(booker));
 
         assertThrows(IllegalArgumentException.class, () -> bookingService.getBookingsByBookerId(booker.getId(), "UNSUPPORTED STATUS", 0, 5));
     }
@@ -419,7 +419,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdOrderByStartDesc(Mockito.anyInt(), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
         assertEquals(bookingsFullDto, bookingService.getAllBookingsForItemsByOwnerId(user.getId(), "ALL", 0, 5));
@@ -438,7 +438,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(LocalDateTime.class), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
@@ -458,7 +458,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdAndEndBeforeOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
@@ -478,7 +478,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdAndStartAfterOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
@@ -498,7 +498,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(Status.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
@@ -518,7 +518,7 @@ class BookingServiceImplTest {
                 .map(BookingMapper::toBookingFullDto)
                 .collect(Collectors.toList());
 
-        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(user));
         when(bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(
                 Mockito.anyInt(), Mockito.any(Status.class), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookings));
 
@@ -527,7 +527,7 @@ class BookingServiceImplTest {
 
     @Test
     void shouldThrowExceptionWhenGetBookingsWithIsUnsupportedStatusByOwnerId() {
-        when(userService.getUserById(user.getId())).thenReturn(UserMapper.toUserDto(user));
+        when(userService.getUserById(user.getId())).thenReturn(UserMapper.INSTANCE.toUserDto(user));
 
         assertThrows(IllegalArgumentException.class, () -> bookingService.getAllBookingsForItemsByOwnerId(user.getId(), "UNSUPPORTED STATUS", 0, 5));
     }

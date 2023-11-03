@@ -174,7 +174,7 @@ class BookingRepositoryTest {
         LocalDateTime end = LocalDateTime.now();
 
         booking1.setStatus(Status.WAITING);
-        booking1.setStart(now);
+        booking1.setStart(now.minusDays(1));
         booking1.setEnd(end);
         bookingRepository.save(booking1);
 
