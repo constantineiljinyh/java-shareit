@@ -28,7 +28,8 @@ public class ItemRequestController {
     private final ItemRequestClient itemRequestClient;
 
     @PostMapping
-    public ResponseEntity<Object> createRequest(@RequestHeader(USER_ID_HEADER) long userId, @Validated @RequestBody ItemRequestDto itemRequestDto) {
+    public ResponseEntity<Object> createRequest(@RequestHeader(USER_ID_HEADER) long userId,
+                                                @Validated @RequestBody ItemRequestDto itemRequestDto) {
         log.info("Creating Request {}, userId={}", itemRequestDto, userId);
         return itemRequestClient.createRequest(userId, itemRequestDto);
     }

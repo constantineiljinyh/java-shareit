@@ -174,8 +174,8 @@ class BookingRepositoryTest {
         LocalDateTime end = LocalDateTime.now();
 
         booking1.setStatus(Status.WAITING);
-        booking1.setStart(now.minusDays(1));
-        booking1.setEnd(end);
+        booking1.setStart(now.minusDays(2));
+        booking1.setEnd(end.minusDays(1));
         bookingRepository.save(booking1);
 
         Page<Booking> bookings = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(

@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.user.dto.UserShortDto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -19,12 +17,9 @@ import java.time.LocalDateTime;
 public class ItemRequestShortDto {
     private Integer requestId;
 
-    @NotBlank
     private String description;
 
-    @NotNull
     private UserShortDto requestor;
 
-    @NotNull
     private LocalDateTime created;
 }

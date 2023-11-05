@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
@@ -14,6 +13,5 @@ import javax.validation.constraints.NotBlank;
 public class ItemShortDto {
     private Integer id;
 
-    @NotBlank(message = "Имя не может быть пустым")
     private String name;
 }

@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,6 +13,5 @@ public class UserShortDto {
 
     private Integer id;
 
-    @NotBlank(message = "Имя не может быть пустым")
     private String name;
 }

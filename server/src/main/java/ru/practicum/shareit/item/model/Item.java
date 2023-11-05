@@ -17,8 +17,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
@@ -33,13 +31,10 @@ public class Item {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @NotNull
     private User owner;
 
-    @NotBlank
     private String name;
 
-    @NotBlank
     @Column(length = 1000)
     private String description;
 
@@ -51,7 +46,6 @@ public class Item {
     @Transient
     private Booking nextBooking;
 
-    @NotNull
     private Boolean available;
 
     @ManyToOne(fetch = FetchType.LAZY)

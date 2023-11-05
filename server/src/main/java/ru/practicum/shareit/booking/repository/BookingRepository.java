@@ -17,13 +17,23 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     boolean existsBookingByIdAndStatusNot(int bookingId, Status status);
 
-    boolean existsBookingByBookerIdAndItemIdAndStatusAndStartBefore(int userId, int itemId, Status status, LocalDateTime currentTime);
+    boolean existsBookingByBookerIdAndItemIdAndStatusAndStartBefore(
+            int userId,
+            int itemId,
+            Status status,
+            LocalDateTime currentTime
+    );
 
     Page<Booking> findAllByBookerIdOrderByStartDesc(@Param("userId") int userId, Pageable pageable);
 
     Page<Booking> findAllByBookerIdAndStatusOrderByStartDesc(int userId, Status status, Pageable pageable);
 
-    Page<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(int userId, LocalDateTime start, LocalDateTime end, Pageable pageable);
+    Page<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
+            int userId,
+            LocalDateTime start,
+            LocalDateTime end,
+            Pageable pageable
+    );
 
     Page<Booking> findAllByBookerIdAndEndBeforeOrderByStartDesc(int userId, LocalDateTime end, Pageable pageable);
 
@@ -33,7 +43,12 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     Page<Booking> findAllByItem_OwnerIdAndStatusOrderByStartDesc(int userId, Status status, Pageable pageable);
 
-    Page<Booking> findAllByItem_OwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(int userId, LocalDateTime start, LocalDateTime end, Pageable pageable);
+    Page<Booking> findAllByItem_OwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
+            int userId,
+            LocalDateTime start,
+            LocalDateTime end,
+            Pageable pageable
+    );
 
     Page<Booking> findAllByItem_OwnerIdAndEndBeforeOrderByStartDesc(int userId, LocalDateTime end, Pageable pageable);
 

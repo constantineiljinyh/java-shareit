@@ -15,8 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
@@ -31,14 +29,11 @@ public class ItemRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @NotNull
     private User requestor;
 
-    @NotNull
     private LocalDateTime created;
 
     @ManyToOne(fetch = FetchType.LAZY)
